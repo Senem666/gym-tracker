@@ -3,7 +3,7 @@
   "name": "Зал-помощник",
   "short_name": "Зал",
   "description": "Тренировки, стрик, дневник веса и таймер отдыха.",
-  "start_url": "gym-assistant-pro.html",
+  "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
