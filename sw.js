@@ -1,4 +1,4 @@
-const CACHE = "gym-assistant-pro-v3";
+const CACHE = "gymper-v5";
 const ASSETS = [
   "index.html",
   "manifest.webmanifest",

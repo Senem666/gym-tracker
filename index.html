@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Зал-помощник</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Gymper</title>
   <meta name="theme-color" content="#101114" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Зал" />
+  <meta name="apple-mobile-web-app-title" content="Gymper" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="gym-icon.svg" type="image/svg+xml" />
   <style>
@@ -37,6 +37,8 @@
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     html {
@@ -53,6 +55,9 @@
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       letter-spacing: 0;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      user-select: none;
     }
 
     button,
@@ -64,7 +69,7 @@
 
     button,
     a.button {
-      min-height: 40px;
+      min-height: 44px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface-2);
@@ -100,6 +105,7 @@
       color: var(--text);
       padding: 10px 9px;
       outline: none;
+      user-select: text;
     }
 
     input[type="number"]:focus,
@@ -110,7 +116,7 @@
     .app-shell {
       width: min(1180px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 22px 0 120px;
+      padding: calc(22px + env(safe-area-inset-top)) 0 calc(120px + env(safe-area-inset-bottom));
       animation: appEnter 420ms ease both;
     }
 
@@ -203,12 +209,36 @@
       background: rgba(47, 199, 121, 0.14);
     }
 
+    .nav-tabs button.active::after,
+    .mode-tabs button.active::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 5px;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--green);
+      animation: tabLine 220ms ease both;
+    }
+
+    .nav-tabs button,
+    .mode-tabs button {
+      position: relative;
+    }
+
     .icon {
       width: 18px;
       height: 18px;
       display: inline-grid;
       place-items: center;
       flex: 0 0 auto;
+      overflow: hidden;
+    }
+
+    .icon svg {
+      width: 100%;
+      height: 100%;
     }
 
     .layout {
@@ -216,6 +246,230 @@
       grid-template-columns: minmax(0, 1fr) 350px;
       gap: 16px;
       align-items: start;
+      animation: tabIn 220ms ease both;
+    }
+
+    .onboarding {
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+      padding: 22px 0;
+    }
+
+    .onboarding > .panel {
+      width: min(620px, 100%);
+    }
+
+    .onboarding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mode-shell {
+      margin-bottom: 14px;
+      animation: tabIn 220ms ease both;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mode-tabs button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .mode-tabs button.active {
+      color: var(--text);
+      border-color: rgba(50, 182, 216, 0.48);
+      background: rgba(50, 182, 216, 0.12);
+    }
+
+    .today-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .today-card {
+      width: 100%;
+      min-height: 126px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 11px;
+      align-items: start;
+      padding: 12px;
+      text-align: left;
+      border-color: color-mix(in srgb, var(--accent), transparent 62%);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent), transparent 88%), transparent 62%),
+        var(--surface);
+    }
+
+    .today-card strong,
+    .today-card span,
+    .today-card em {
+      display: block;
+      min-width: 0;
+    }
+
+    .today-card strong {
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .today-card span span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .today-card em {
+      margin-top: 8px;
+      color: color-mix(in srgb, var(--accent), white 14%);
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .recovery-bar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .recovery-bar.warning {
+      border-color: rgba(239, 83, 80, 0.36);
+      background: rgba(239, 83, 80, 0.08);
+    }
+
+    .recovery-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+    }
+
+    .recovery-fill {
+      height: 100%;
+      border-radius: inherit;
+      transition: width 420ms ease;
+    }
+
+    .recovery-value,
+    .recovery-label {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .recovery-bar small {
+      grid-column: 1 / -1;
+      color: var(--red);
+      line-height: 1.35;
+    }
+
+    .recovery-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.42);
+      z-index: 25;
+      animation: toastIn 220ms ease both;
+    }
+
+    .recovery-card {
+      width: min(420px, 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .recovery-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .recovery-options button {
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      min-height: 78px;
+      padding: 10px;
+    }
+
+    .recovery-options strong {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .recovery-options span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .home-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .home-row:last-child {
+      border-bottom: 0;
+    }
+
+    .yoga-focus {
+      display: grid;
+      gap: 12px;
+      justify-items: start;
+      overflow: hidden;
+    }
+
+    .yoga-focus h2 {
+      font-size: 26px;
+      line-height: 1.1;
+    }
+
+    .yoga-icon {
+      width: 70px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      border: 1px solid rgba(47, 199, 121, 0.28);
+      background: rgba(47, 199, 121, 0.1);
+      color: var(--green);
+      animation: breathe 2200ms ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+
+    .yoga-icon svg {
+      width: 34px;
+      height: 34px;
     }
 
     .stack {
@@ -270,6 +524,39 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
+    }
+
+    .phase-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .phase-group {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .phase-group.active {
+      border-color: rgba(47, 199, 121, 0.34);
+      background: rgba(47, 199, 121, 0.06);
+    }
+
+    .phase-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .phase-group-head span {
+      color: var(--dim);
+      font-weight: 700;
     }
 
     .week-card {
@@ -614,9 +901,14 @@
       gap: 8px;
     }
 
+    .set-wrap {
+      display: grid;
+      gap: 7px;
+    }
+
     .set-row {
       display: grid;
-      grid-template-columns: 42px minmax(90px, 1fr) minmax(112px, 1fr) 42px;
+      grid-template-columns: 42px minmax(126px, 1fr) minmax(112px, 1fr) 44px;
       gap: 8px;
       align-items: center;
       padding: 8px;
@@ -648,23 +940,54 @@
       align-items: center;
     }
 
+    .weight-control {
+      display: grid;
+      grid-template-columns: 44px minmax(54px, 1fr) 44px;
+      gap: 5px;
+      align-items: center;
+    }
+
     .rep-control button,
+    .weight-control button,
     .set-check,
     .timer-actions button,
     .water-stepper button,
     .icon-button {
       display: grid;
       place-items: center;
-      width: 40px;
-      min-width: 40px;
+      width: 44px;
+      min-width: 44px;
       padding: 0;
       aspect-ratio: 1;
     }
 
-    .rep-control input {
+    .rep-control input,
+    .weight-control input {
       text-align: center;
       padding-left: 4px;
       padding-right: 4px;
+    }
+
+    .set-rpe {
+      padding: 10px;
+      border: 1px solid rgba(50, 182, 216, 0.2);
+      border-radius: var(--radius);
+      background: rgba(50, 182, 216, 0.055);
+      animation: detailIn 220ms ease both;
+    }
+
+    .set-rpe-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .exercise.shake {
+      animation: shakeCard 280ms ease both;
     }
 
     .set-check.done {
@@ -902,6 +1225,22 @@
       font-size: 12px;
     }
 
+    .sparkline {
+      width: 100%;
+      height: 34px;
+      margin-top: 9px;
+      overflow: visible;
+    }
+
+    .sparkline polyline {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 4px 10px rgba(47, 199, 121, 0.25));
+    }
+
     .empty-state {
       padding: 22px 12px;
       border: 1px dashed var(--line-strong);
@@ -1107,6 +1446,15 @@
       color: var(--muted);
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+    }
+
+    .calendar-day em {
+      position: absolute;
+      right: 4px;
+      top: 3px;
+      font-style: normal;
+      font-size: 11px;
     }
 
     .calendar-day.done {
@@ -1151,6 +1499,28 @@
       background: rgba(50, 182, 216, 0.12);
     }
 
+    .calendar-legend,
+    .calendar-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .calendar-legend span,
+    .calendar-detail span,
+    .calendar-detail strong {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
     .rpe-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1183,8 +1553,123 @@
 
     .record-grid,
     .muscle-grid,
-    .iphone-grid {
+    .iphone-grid,
+    .rings-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .body-map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .body-map-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .body-svg {
+      width: 100%;
+      max-width: 140px;
+      height: auto;
+    }
+
+    .body-svg [data-action="body-muscle"] {
+      cursor: pointer;
+      transition: opacity 300ms ease, filter 300ms ease, transform 220ms var(--ease-spring);
+      transform-origin: center;
+    }
+
+    .body-svg [data-action="body-muscle"]:active {
+      transform: scale(0.96);
+    }
+
+    .body-map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 30px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .body-weight-input {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .body-weight-input button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 11px;
+      font-weight: 800;
+    }
+
+    .weight-chart-svg {
+      width: 100%;
+      min-height: 86px;
+      margin: 12px 0;
+      overflow: visible;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .body-log-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .ring-card {
+      display: grid;
+      justify-items: center;
+      gap: 9px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .ring-card strong {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .small-ring {
+      width: 70px;
+      font-size: 13px;
     }
 
     .record-card,
@@ -1278,6 +1763,11 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes tabIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @keyframes detailIn {
       from { opacity: 0; transform: translateY(-6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1299,6 +1789,11 @@
       to { transform: translateY(0); }
     }
 
+    @keyframes tabLine {
+      from { transform: scaleX(0.35); opacity: 0; }
+      to { transform: scaleX(1); opacity: 1; }
+    }
+
     @keyframes toastIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1307,6 +1802,18 @@
     @keyframes flamePulse {
       0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 209, 102, 0)); }
       50% { transform: scale(1.04); filter: drop-shadow(0 0 18px rgba(255, 209, 102, 0.22)); }
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-3px); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.92; }
+      50% { transform: scale(1.06); opacity: 1; }
     }
 
     @keyframes confettiFall {
@@ -1341,6 +1848,33 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
       transition: opacity 180ms ease, transform 220ms var(--ease-spring), border-color 180ms ease;
+    }
+
+    .pull-indicator {
+      position: fixed;
+      left: 50%;
+      top: calc(10px + env(safe-area-inset-top));
+      z-index: 18;
+      transform: translateX(-50%) translateY(-18px);
+      opacity: 0;
+      pointer-events: none;
+      min-height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 7px 12px;
+      border: 1px solid rgba(50, 182, 216, 0.36);
+      border-radius: 999px;
+      background: rgba(17, 20, 25, 0.96);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: opacity 160ms ease, transform 180ms ease;
+    }
+
+    .pull-indicator.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     .mini-timer.is-hidden {
@@ -1396,7 +1930,8 @@
     @media (max-width: 720px) {
       .app-shell {
         width: min(100% - 20px, 1180px);
-        padding-top: 12px;
+        padding-top: calc(12px + env(safe-area-inset-top));
+        padding-bottom: calc(152px + env(safe-area-inset-bottom));
       }
 
       .topbar {
@@ -1407,9 +1942,45 @@
         width: 100%;
       }
 
-      .nav-tabs,
       .day-grid {
         grid-template-columns: 1fr;
+      }
+
+      .nav-tabs {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        z-index: 14;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 4px;
+        margin: 0;
+        padding: 6px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(17, 20, 25, 0.96);
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow);
+      }
+
+      .nav-tabs button {
+        min-height: 54px;
+        flex-direction: column;
+        gap: 3px;
+        padding: 6px 2px 8px;
+        font-size: 9px;
+      }
+
+      .nav-tabs button span:not(.icon) {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mini-timer {
+        bottom: calc(86px + env(safe-area-inset-bottom));
       }
 
       .week-grid,
@@ -1417,7 +1988,9 @@
       .reward-grid,
       .record-grid,
       .muscle-grid,
-      .iphone-grid {
+      .iphone-grid,
+      .rings-grid,
+      .today-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -1435,7 +2008,7 @@
       }
 
       .set-row {
-        grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) 40px;
+        grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr) 44px;
         gap: 6px;
       }
 
@@ -1446,13 +2019,20 @@
       .chevron {
         display: none;
       }
+
+      .onboarding-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 440px) {
       .reward-grid,
       .record-grid,
       .muscle-grid,
-      .iphone-grid {
+      .iphone-grid,
+      .rings-grid,
+      .today-grid,
+      .mode-tabs {
         grid-template-columns: 1fr;
       }
 
@@ -1461,7 +2041,7 @@
       }
 
       .set-row {
-        grid-template-columns: 34px 1fr 40px;
+        grid-template-columns: 34px minmax(0, 1fr) 44px;
         align-items: end;
       }
 
@@ -1488,6 +2068,20 @@
       .set-row .rep-control {
         grid-template-columns: 40px minmax(0, 1fr) 40px;
       }
+
+      .set-row .weight-control {
+        grid-template-columns: 40px minmax(0, 1fr) 40px;
+      }
+
+      .body-weight-input,
+      .recovery-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .recovery-value,
+      .recovery-label {
+        white-space: normal;
+      }
     }
   </style>
 </head>
@@ -1498,6 +2092,13 @@
 
   <script>
     const STORAGE_KEY = "gym-assistant-pro-v1";
+    const PROFILE_KEY = "userProfile";
+    const EXERCISE_DATA_KEY = "exerciseData";
+    const WORKOUT_LOG_KEY = "workoutLog";
+    const STREAK_KEY = "streak";
+    const BODY_LOG_KEY = "bodyLog";
+    const RECOVERY_KEY = "recoveryLog";
+    const REMINDERS_SHOWN_KEY = "remindersShown";
     const TODAY_KEY = new Date().toISOString().slice(0, 10);
 
     const MUSCLE_COLOR = {
@@ -1507,8 +2108,37 @@
       "Плечи": "#8a72e8",
       "Бицепс": "#32b6d8",
       "Трицепс": "#e85c9f",
-      "Кор": "#2fc779"
+      "Кор": "#2fc779",
+      "Пресс": "#2fc779"
     };
+
+    const MUSCLE_SVG_MAP = {
+      "Ноги": ["front-quads", "front-calves", "back-hamstrings", "back-glutes", "back-calves"],
+      "Грудь": ["front-chest"],
+      "Спина": ["back-lats", "back-traps", "back-rhomboids"],
+      "Плечи": ["front-shoulders", "back-shoulders"],
+      "Бицепс": ["front-biceps"],
+      "Трицепс": ["back-triceps"],
+      "Кор": ["front-abs"],
+      "Пресс": ["front-abs"]
+    };
+
+    const XP_TABLE = {
+      gymWorkout: 120,
+      homeWorkout: 90,
+      yoga: 35,
+      set: 8,
+      prBeat: 50,
+      streak7: 200,
+      streak30: 500,
+      bodyWeightLog: 10,
+      waterGoal: 25,
+      deloadComplete: 150,
+      phaseComplete: 300,
+      fullCycleComplete: 1000
+    };
+
+    const LEVEL_NAMES = ["Новичок", "Стажёр", "Атлет", "Спортсмен", "Ветеран", "Чемпион", "Легенда", "Элита", "Мастер"];
 
     const ICONS = {
       dumbbell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5 17.5 17.5"/><path d="m21 14-7 7"/><path d="m3 10 7-7"/><path d="m5 12-3-3 7-7 3 3"/><path d="m19 12 3 3-7 7-3-3"/></svg>',
@@ -1542,19 +2172,27 @@
     };
 
     const RPE_OPTIONS = [
-      { id: "easy", label: "легко", color: "#2fc779", add: true },
-      { id: "ok", label: "нормально", color: "#32b6d8", add: true },
-      { id: "hard", label: "тяжело", color: "#f3a928", add: false },
-      { id: "pain", label: "больно", color: "#ef5350", add: false }
+      { id: "tooEasy", value: 4, label: "😴 Слишком легко", short: "легко", color: "#2fc779", delta: 5, tip: "Следующий подход можно попробовать тяжелее." },
+      { id: "good", value: 6, label: "💪 Хорошо", short: "хорошо", color: "#32b6d8", delta: 0, tip: "Это рабочий вес. Сохраняю как базовый." },
+      { id: "hard", value: 8, label: "🔥 Тяжело", short: "тяжело", color: "#f3a928", delta: -5, tip: "Уменьши вес и держи технику." },
+      { id: "failed", value: 10, label: "💀 Не смог", short: "не смог", color: "#ef5350", delta: -10, tip: "Сильно облегчи следующий подход." }
     ];
 
     const ACHIEVEMENTS = [
-      { id: "first", icon: "medal", title: "Первый заход", desc: "заверши первую тренировку" },
-      { id: "perfectWeek", icon: "trophy", title: "Идеальная неделя", desc: "3 тренировки за неделю" },
-      { id: "month8", icon: "calendar", title: "Стабильный месяц", desc: "8 тренировок за месяц" },
-      { id: "volume10k", icon: "activity", title: "10 000 кг", desc: "набери объем за месяц" },
-      { id: "hydrated", icon: "water", title: "Гидратация", desc: "6 стаканов воды за день" },
-      { id: "noMiss", icon: "shield", title: "Без пропусков", desc: "закрой месяц без красных дней" }
+      { id: "first", icon: "🥉", title: "Первый шаг", desc: "Первая тренировка" },
+      { id: "week1", icon: "🥈", title: "Неделя пройдена", desc: "3 тренировки за неделю" },
+      { id: "perfectWeek", icon: "🥇", title: "Идеальная неделя", desc: "0 пропусков за неделю" },
+      { id: "phase1", icon: "💪", title: "Фаза 1 закрыта", desc: "4 недели адаптации" },
+      { id: "phase2", icon: "🔥", title: "Фаза 2 закрыта", desc: "4 недели гипертрофии" },
+      { id: "phase3", icon: "⚡", title: "Фаза 3 закрыта", desc: "4 недели силы" },
+      { id: "fullCycle", icon: "🏆", title: "Полный цикл", desc: "13 недель с deload" },
+      { id: "month8", icon: "📅", title: "Месячник", desc: "8 тренировок за месяц" },
+      { id: "volume10k", icon: "📦", title: "10 тонн", desc: "10 000 кг суммарного объема" },
+      { id: "hydrated", icon: "💧", title: "Водяной", desc: "6 стаканов воды за день" },
+      { id: "noMiss", icon: "🎯", title: "Без пропусков", desc: "Ни одного пропуска в месяце" },
+      { id: "prBeat", icon: "🆙", title: "Личный рекорд", desc: "Побил свой рекорд по весу" },
+      { id: "yoga7", icon: "🧘", title: "Йога-марафон", desc: "7 дней йоги подряд" },
+      { id: "home10", icon: "🏠", title: "Домашний атлет", desc: "10 домашних тренировок" }
     ];
 
     const SCHEDULE_DAYS = {
@@ -1562,6 +2200,93 @@
       3: "Ср",
       5: "Пт"
     };
+
+    const PLAN_BY_WEEKDAY = {
+      1: { type: "gym", label: "Зал", dayIdx: 0 },
+      2: { type: "home", label: "Дом", slot: "tue" },
+      3: { type: "gym", label: "Зал", dayIdx: 1 },
+      4: { type: "home", label: "Дом", slot: "thu" },
+      5: { type: "gym", label: "Зал", dayIdx: 2 },
+      6: { type: "rest", label: "Растяжка" },
+      0: { type: "rest", label: "Отдых" }
+    };
+
+    const SMART_REMINDERS = [
+      {
+        id: "streak_at_risk",
+        title: "Стрик под угрозой",
+        check: () => {
+          const plan = todayPlan();
+          const progress = plan.type === "gym" ? workoutProgress(state.weekIdx, plan.dayIdx).pct : 100;
+          return new Date().getHours() >= 19 && plan.type === "gym" && progress < 100;
+        },
+        message: "Сегодня по плану зал. Еще есть время — хотя бы 20 минут засчитается!"
+      },
+      {
+        id: "water_reminder",
+        title: "Вода",
+        check: () => dailyState().water < 3 && new Date().getHours() >= 14,
+        message: "Ты выпил меньше 3 стаканов воды. Мышцы восстанавливаются лучше при нормальной гидрации."
+      },
+      {
+        id: "pr_opportunity",
+        title: "Личный рекорд близко",
+        check: () => currentProgressionSuggestions().length > 0,
+        message: () => {
+          const suggestions = currentProgressionSuggestions();
+          if (!suggestions.length) return "";
+          const s = suggestions[0];
+          return `${s.ex.name}: попробуй ${s.suggestion.next} кг сегодня. Прошлый RPE был ${s.suggestion.rating}.`;
+        }
+      },
+      {
+        id: "yoga_not_done",
+        title: "Утренняя йога",
+        check: () => !yogaDayState().done && new Date().getHours() >= 8,
+        message: "Ты еще не отметил утреннюю йогу. 10 минут сейчас — и день пройдет лучше."
+      }
+    ];
+
+    const HOME_WORKOUTS = [
+      {
+        id: "wt-a-upper",
+        slot: "tue",
+        name: "WT-A · Верх дома",
+        focus: "гантели 2/5 кг + корпус",
+        exercises: ["Жим гантелей лежа на полу", "Тяга гантели к поясу", "Подъемы гантелей в стороны", "Сгибания на бицепс", "Планка на локтях"]
+      },
+      {
+        id: "wt-b-lower",
+        slot: "thu",
+        name: "WT-B · Низ дома",
+        focus: "ноги, ягодицы, стабильность",
+        exercises: ["Гоблет-присед", "Румынская тяга с гантелями", "Выпады назад", "Ягодичный мост", "Подъемы на носки"]
+      },
+      {
+        id: "th-a-core",
+        slot: "tue",
+        name: "TH-A · Кор + кардио",
+        focus: "20-30 минут, пульс без добивания",
+        exercises: ["Dead bug", "Mountain climber медленно", "Русские скручивания без рывка", "Bird dog", "Шаги в планке"]
+      },
+      {
+        id: "th-b-full",
+        slot: "thu",
+        name: "TH-B · Full body",
+        focus: "техника, дыхание, легкий памп",
+        exercises: ["Присед с паузой", "Отжимания от опоры", "Тяга двух гантелей", "Жим гантелей стоя", "Фермерская прогулка на месте"]
+      }
+    ];
+
+    const YOGA_PROGRAMS = [
+      { day: 1, name: "Понедельник · плечи и грудь", icon: "stretch", youtube: "https://www.youtube.com/results?search_query=morning+mobility+shoulders+chest+10+minutes", poses: [["Круги плечами", 45], ["Раскрытие груди у стены", 60], ["Кошка-корова", 60], ["Поза ребенка", 75], ["Дыхание сидя", 60]] },
+      { day: 2, name: "Вторник · таз и бедра", icon: "activity", youtube: "https://www.youtube.com/results?search_query=hip+mobility+morning+10+minutes", poses: [["90/90 переходы", 60], ["Низкий выпад", 60], ["Голубь облегченный", 60], ["Наклон к ноге", 60], ["Дыхание лежа", 60]] },
+      { day: 3, name: "Среда · спина", icon: "stretch", youtube: "https://www.youtube.com/results?search_query=back+mobility+morning+10+minutes", poses: [["Кошка-корова", 60], ["Повороты грудного отдела", 60], ["Сфинкс", 60], ["Поза ребенка с руками в сторону", 60], ["Мягкое скручивание лежа", 60]] },
+      { day: 4, name: "Четверг · кор и дыхание", icon: "target", youtube: "https://www.youtube.com/results?search_query=core+breathing+mobility+10+minutes", poses: [["Dead bug медленно", 45], ["Планка на коленях", 30], ["Bird dog", 60], ["Happy baby", 60], ["Дыхание 4-6", 75]] },
+      { day: 5, name: "Пятница · ноги после зала", icon: "activity", youtube: "https://www.youtube.com/results?search_query=leg+stretch+after+gym+10+minutes", poses: [["Квадрицепс стоя", 60], ["Задняя поверхность бедра", 60], ["Икры у стены", 60], ["Глубокий присед с опорой", 60], ["Поза ребенка", 60]] },
+      { day: 6, name: "Суббота · восстановление", icon: "sparkles", youtube: "https://www.youtube.com/results?search_query=full+body+recovery+yoga+15+minutes", poses: [["Складка сидя", 75], ["Голубь облегченный", 75], ["Скручивание лежа", 75], ["Ноги на стену", 120], ["Дыхание", 60]] },
+      { day: 0, name: "Воскресенье · легкий рестарт", icon: "shield", youtube: "https://www.youtube.com/results?search_query=gentle+morning+yoga+10+minutes", poses: [["Шея и трапеции", 60], ["Круги тазом", 45], ["Собака мордой вниз облегченно", 60], ["Поза ребенка", 75], ["Тихое дыхание", 90]] }
+    ];
 
     const EXERCISES = {
       legPress: {
@@ -1579,11 +2304,12 @@
         ]
       },
       hackSquat: {
-        name: "Hack squat",
+        name: "Гак-присед",
         muscles: "Ноги",
+        level: "mid",
         startWeight: "без блинов или +10 кг",
         machine: "Hack squat machine",
-        tip: "Спина прижата, стопы чуть выше середины платформы, движение без рывка.",
+        tip: "Спина прижата к спинке, колени над носками, опускаешься до угла около 90 градусов.",
         cues: ["Начни с короткой амплитуды и найди комфорт коленей.", "Не заваливай колени внутрь.", "Выход наверх контролируй, не отстреливайся."],
         video: "https://www.youtube.com/results?search_query=hack+squat+machine+proper+form",
         alternatives: [
@@ -1826,6 +2552,104 @@
           { name: "Планка", machine: "Коврик", tip: "Самая простая замена для корпуса.", video: "https://www.youtube.com/results?search_query=plank+proper+form" },
           { name: "Dead bug", machine: "Коврик", tip: "Тихая замена, если блок занят.", video: "https://www.youtube.com/results?search_query=dead+bug+exercise+proper+form" }
         ]
+      },
+      inclineChestPress: {
+        name: "Жим в наклонном тренажере",
+        muscles: "Грудь",
+        level: "mid",
+        startWeight: "",
+        machine: "Incline chest press machine",
+        tip: "Угол наклона 30-45 градусов, тянешь верхнюю грудь, локти не разводи слишком широко.",
+        cues: ["Лопатки сведены.", "Ручки идут к верхней части груди.", "Не выжимай локти в жесткий замок."],
+        video: "https://www.youtube.com/results?search_query=incline+chest+press+machine+technique",
+        alternatives: [
+          { name: "Жим гантелей на наклонной", machine: "Наклонная скамья + гантели", tip: "Наклон 20-30 градусов, движение ровное.", startWeight: "", video: "https://www.youtube.com/results?search_query=incline+dumbbell+press+technique" },
+          { name: "Жим в тренажере сидя", machine: "Chest press", tip: "Стабильная замена, если наклонный занят.", startWeight: "", video: "https://www.youtube.com/results?search_query=machine+chest+press+technique" }
+        ]
+      },
+      tBarRow: {
+        name: "Тяга Т-грифа",
+        muscles: "Спина",
+        level: "high",
+        startWeight: "",
+        machine: "T-bar row machine / угол со штангой",
+        tip: "Спина прямая под углом около 45 градусов, тянешь к животу, локти вдоль тела.",
+        cues: ["Не округляй поясницу.", "Начинай движение лопаткой.", "Вверх без рывка корпусом."],
+        video: "https://www.youtube.com/results?search_query=t+bar+row+technique",
+        alternatives: [
+          { name: "Тяга гантели в наклоне", machine: "Гантель + скамья", tip: "Одна рука, колено на скамье.", startWeight: "", video: "https://www.youtube.com/results?search_query=one+arm+dumbbell+row+technique" },
+          { name: "Тяга горизонтального блока", machine: "Seated cable row", tip: "Более спокойная замена для спины.", startWeight: "", video: "https://www.youtube.com/results?search_query=seated+cable+row+technique" }
+        ]
+      },
+      assistedPullUp: {
+        name: "Подтягивания в тренажере",
+        muscles: "Спина",
+        level: "mid",
+        startWeight: "",
+        machine: "Assisted pull-up machine",
+        tip: "Чем больше вес противовеса, тем легче. Тянись грудью к перекладине, не подбородком.",
+        cues: ["Держи ребра вниз.", "Опускайся медленно.", "Локти веди к ребрам."],
+        video: "https://www.youtube.com/results?search_query=assisted+pull+up+machine+technique",
+        alternatives: [
+          { name: "Тяга верхнего блока", machine: "Lat pulldown", tip: "Та же мышца, другой угол.", startWeight: "", video: "https://www.youtube.com/results?search_query=lat+pulldown+technique" },
+          { name: "Тяга верхнего блока широким хватом", machine: "Lat pulldown", tip: "Если гравитрон занят.", startWeight: "", video: "https://www.youtube.com/results?search_query=wide+grip+lat+pulldown+technique" }
+        ]
+      },
+      arnoldPress: {
+        name: "Жим Арнольда",
+        muscles: "Плечи",
+        level: "high",
+        startWeight: "",
+        machine: "Гантели сидя",
+        tip: "Начинаешь с ладонями к себе и разворачиваешь руки в верхней точке. Полная амплитуда без боли.",
+        cues: ["Спина на опоре.", "Не прогибай поясницу.", "Двигайся медленнее, чем хочется."],
+        video: "https://www.youtube.com/results?search_query=arnold+press+technique",
+        alternatives: [
+          { name: "Жим гантелей сидя", machine: "Гантели", tip: "Без разворота, проще контролировать.", startWeight: "", video: "https://www.youtube.com/results?search_query=seated+dumbbell+press+technique" },
+          { name: "Жим в тренажере сидя", machine: "Shoulder press", tip: "Самая стабильная замена.", startWeight: "", video: "https://www.youtube.com/results?search_query=machine+shoulder+press+technique" }
+        ]
+      },
+      hammerCurl: {
+        name: "Молотковые сгибания",
+        muscles: "Бицепс",
+        level: "mid",
+        startWeight: "",
+        machine: "Гантели стоя",
+        tip: "Ладони смотрят друг на друга весь подход, локти у тела, без раскачки.",
+        cues: ["Корпус тихий.", "Кисть нейтральная.", "Опускай вес до полного контроля."],
+        video: "https://www.youtube.com/results?search_query=hammer+curl+technique",
+        alternatives: [
+          { name: "Сгибание на нижнем блоке", machine: "Cable", tip: "Веревочная рукоять.", startWeight: "", video: "https://www.youtube.com/results?search_query=rope+cable+curl+technique" },
+          { name: "Сгибания с гантелями", machine: "Гантели", tip: "Обычный хват, локти у корпуса.", startWeight: "", video: "https://www.youtube.com/results?search_query=dumbbell+curl+technique" }
+        ]
+      },
+      overheadTricep: {
+        name: "Разгибание из-за головы (блок)",
+        muscles: "Трицепс",
+        level: "mid",
+        startWeight: "",
+        machine: "Cable верхний блок, веревка",
+        tip: "Локти у головы, разгибаешь вниз-вперед, акцент на длинную головку трицепса.",
+        cues: ["Не разваливай локти.", "Корпус стабилен.", "Возврат плавный."],
+        video: "https://www.youtube.com/results?search_query=overhead+tricep+extension+cable+technique",
+        alternatives: [
+          { name: "Французский жим гантелью", machine: "Гантель лежа", tip: "Одна или две руки.", startWeight: "", video: "https://www.youtube.com/results?search_query=dumbbell+french+press+technique" },
+          { name: "Разгибание рук на верхнем блоке", machine: "Cable", tip: "Если плечу некомфортно над головой.", startWeight: "", video: "https://www.youtube.com/results?search_query=triceps+pushdown+technique" }
+        ]
+      },
+      latPulldownWide: {
+        name: "Тяга верхнего блока широким хватом",
+        muscles: "Спина",
+        level: "low",
+        startWeight: "",
+        machine: "Lat pulldown - широкий гриф",
+        tip: "Хват шире плеч, тянешь к верхней части груди, локти вниз и назад.",
+        cues: ["Не тяни за шею.", "Сначала опусти лопатки.", "Не раскачивай корпус."],
+        video: "https://www.youtube.com/results?search_query=wide+grip+lat+pulldown+technique",
+        alternatives: [
+          { name: "Тяга узким хватом", machine: "Lat pulldown - узкая рукоять", tip: "Акцент на нижние широчайшие.", startWeight: "", video: "https://www.youtube.com/results?search_query=close+grip+lat+pulldown+technique" },
+          { name: "Подтягивания в тренажере", machine: "Assisted pull-up", tip: "Другой угол для широчайших.", startWeight: "", video: "https://www.youtube.com/results?search_query=assisted+pull+up+machine+technique" }
+        ]
       }
     };
 
@@ -1837,6 +2661,8 @@
       {
         id: "w1",
         week: 1,
+        phase: 1,
+        phaseLabel: "Фаза 1 · Адаптация",
         label: "Вход",
         tag: "техника, легкий вес, спокойный темп",
         days: [
@@ -1872,6 +2698,8 @@
       {
         id: "w2",
         week: 2,
+        phase: 1,
+        phaseLabel: "Фаза 1 · Адаптация",
         label: "Разгон",
         tag: "чередуем тренажеры и добавляем объем",
         days: [
@@ -1882,7 +2710,7 @@
             schedule: "Понедельник",
             focus: "Hack squat + верх",
             color: "#ef5350",
-            exercises: [ex("hackSquat", 3, 10, 105), ex("inclinePress", 3, 10, 90), ex("assistedPullup", 3, 8, 90), ex("preacherCurl", 3, 10, 60), ex("overheadTriceps", 3, 10, 60), ex("calfRaise", 3, 14, 45)]
+            exercises: [ex("legPress", 3, 10, 105), ex("chestPress", 3, 10, 90), ex("latPulldown", 3, 8, 90), ex("cableCurl", 3, 10, 60), ex("tricepsPushdown", 3, 10, 60), ex("calfRaise", 3, 14, 45)]
           },
           {
             id: "w2b",
@@ -1907,6 +2735,8 @@
       {
         id: "w3",
         week: 3,
+        phase: 1,
+        phaseLabel: "Фаза 1 · Адаптация",
         label: "Объем",
         tag: "если техника чистая, добавь небольшой вес",
         days: [
@@ -1917,7 +2747,7 @@
             schedule: "Понедельник",
             focus: "Ноги + жим + вертикальная тяга",
             color: "#ef5350",
-            exercises: [ex("legPress", 4, 8, 120), ex("chestPress", 4, 8, 120), ex("latPulldown", 4, 8, 120), ex("preacherCurl", 3, 10, 75), ex("tricepsPushdown", 3, 10, 75), ex("pallof", 3, 10, 45)]
+            exercises: [ex("legPress", 4, 8, 120), ex("chestPress", 4, 8, 120), ex("latPulldown", 4, 8, 120), ex("cableCurl", 3, 10, 75), ex("tricepsPushdown", 3, 10, 75), ex("pallof", 3, 10, 45)]
           },
           {
             id: "w3b",
@@ -1926,7 +2756,7 @@
             schedule: "Среда",
             focus: "Задняя цепь + плечи",
             color: "#f3a928",
-            exercises: [ex("legCurl", 4, 10, 90), ex("hackSquat", 3, 10, 105), ex("shoulderPress", 4, 8, 105), ex("seatedRow", 4, 10, 90), ex("facePull", 3, 12, 60), ex("calfRaise", 3, 14, 45)]
+            exercises: [ex("legCurl", 4, 10, 90), ex("legPress", 3, 10, 105), ex("shoulderPress", 4, 8, 105), ex("seatedRow", 4, 10, 90), ex("facePull", 3, 12, 60), ex("calfRaise", 3, 14, 45)]
           },
           {
             id: "w3c",
@@ -1935,13 +2765,15 @@
             schedule: "Пятница",
             focus: "Все тело с мягким объемом",
             color: "#2fc779",
-            exercises: [ex("legExtension", 3, 12, 75), ex("inclinePress", 3, 10, 90), ex("assistedPullup", 3, 8, 90), ex("pecDeck", 2, 12, 60), ex("lateralRaise", 3, 12, 60), ex("overheadTriceps", 2, 12, 60)]
+            exercises: [ex("legExtension", 3, 12, 75), ex("chestPress", 3, 10, 90), ex("latPulldown", 3, 8, 90), ex("pecDeck", 2, 12, 60), ex("lateralRaise", 3, 12, 60), ex("tricepsPushdown", 2, 12, 60)]
           }
         ]
       },
       {
         id: "w4",
         week: 4,
+        phase: 1,
+        phaseLabel: "Фаза 1 · Адаптация",
         label: "Пик",
         tag: "тяжело, но без потери техники",
         days: [
@@ -1952,7 +2784,7 @@
             schedule: "Понедельник",
             focus: "Главные движения месяца",
             color: "#ef5350",
-            exercises: [ex("hackSquat", 4, 8, 120), ex("chestPress", 4, 8, 120), ex("assistedPullup", 4, 8, 120), ex("cableCurl", 3, 10, 75), ex("overheadTriceps", 3, 10, 75), ex("plank", 3, 40, 45)]
+            exercises: [ex("legPress", 4, 8, 120), ex("chestPress", 4, 8, 120), ex("latPulldown", 4, 8, 120), ex("cableCurl", 3, 10, 75), ex("tricepsPushdown", 3, 10, 75), ex("plank", 3, 40, 45)]
           },
           {
             id: "w4b",
@@ -1970,7 +2802,340 @@
             schedule: "Пятница",
             focus: "Итоговая тренировка месяца",
             color: "#2fc779",
-            exercises: [ex("legExtension", 3, 12, 75), ex("inclinePress", 3, 10, 90), ex("latPulldown", 3, 10, 90), ex("pecDeck", 3, 12, 60), ex("lateralRaise", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+            exercises: [ex("legExtension", 3, 12, 75), ex("chestPress", 3, 10, 90), ex("latPulldown", 3, 10, 90), ex("pecDeck", 3, 12, 60), ex("lateralRaise", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+          }
+        ]
+      },
+      {
+        id: "w5",
+        week: 5,
+        phase: 2,
+        phaseLabel: "Фаза 2 · Гипертрофия",
+        label: "Новый объем",
+        tag: "больше подходов, новые движения, RPE 6-8",
+        days: [
+          {
+            id: "w5a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Ноги + верх груди + ширина спины",
+            color: "#ef5350",
+            exercises: [ex("legPress", 4, 8, 120), ex("inclineChestPress", 4, 8, 105), ex("latPulldownWide", 4, 8, 105), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75), ex("calfRaise", 3, 14, 60)]
+          },
+          {
+            id: "w5b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Гак + плечи + плотная спина",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 3, 10, 105), ex("shoulderPress", 4, 8, 105), ex("tBarRow", 3, 10, 105), ex("facePull", 3, 12, 60), ex("pecDeck", 3, 12, 60), ex("pallof", 3, 10, 45)]
+          },
+          {
+            id: "w5c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Задняя цепь + подтягивания + руки",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 3, 12, 90), ex("inclineChestPress", 3, 10, 90), ex("assistedPullUp", 3, 8, 90), ex("lateralRaise", 3, 14, 60), ex("cableCurl", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+          }
+        ]
+      },
+      {
+        id: "w6",
+        week: 6,
+        phase: 2,
+        phaseLabel: "Фаза 2 · Гипертрофия",
+        label: "Плотность",
+        tag: "тот же шаблон, чуть плотнее контроль",
+        days: [
+          {
+            id: "w6a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Жим ногами + наклонный жим",
+            color: "#ef5350",
+            exercises: [ex("legPress", 4, 10, 105), ex("inclineChestPress", 4, 8, 105), ex("latPulldownWide", 4, 10, 90), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75), ex("calfRaise", 3, 15, 60)]
+          },
+          {
+            id: "w6b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Гак-присед + Т-гриф",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 3, 10, 105), ex("shoulderPress", 4, 8, 105), ex("tBarRow", 3, 10, 105), ex("facePull", 3, 12, 60), ex("pecDeck", 3, 12, 60), ex("pallof", 3, 12, 45)]
+          },
+          {
+            id: "w6c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Подтягивания в тренажере + дельты",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 3, 12, 90), ex("inclineChestPress", 3, 10, 90), ex("assistedPullUp", 3, 8, 90), ex("lateralRaise", 3, 14, 60), ex("cableCurl", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+          }
+        ]
+      },
+      {
+        id: "w7",
+        week: 7,
+        phase: 2,
+        phaseLabel: "Фаза 2 · Гипертрофия",
+        label: "Памп",
+        tag: "объем держим, техника главнее веса",
+        days: [
+          {
+            id: "w7a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Ноги + грудь + широкая тяга",
+            color: "#ef5350",
+            exercises: [ex("legPress", 4, 8, 120), ex("inclineChestPress", 4, 8, 105), ex("latPulldownWide", 4, 8, 105), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75), ex("calfRaise", 3, 14, 60)]
+          },
+          {
+            id: "w7b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Плечи и середина спины",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 3, 10, 105), ex("arnoldPress", 3, 10, 90), ex("tBarRow", 3, 10, 105), ex("facePull", 3, 12, 60), ex("pecDeck", 3, 12, 60), ex("pallof", 3, 10, 45)]
+          },
+          {
+            id: "w7c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Задняя цепь + руки",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 3, 12, 90), ex("inclineChestPress", 3, 10, 90), ex("assistedPullUp", 3, 8, 90), ex("lateralRaise", 3, 14, 60), ex("cableCurl", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+          }
+        ]
+      },
+      {
+        id: "w8",
+        week: 8,
+        phase: 2,
+        phaseLabel: "Фаза 2 · Гипертрофия",
+        label: "Закрытие фазы",
+        tag: "последняя объемная неделя перед силой",
+        days: [
+          {
+            id: "w8a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Проверка объема",
+            color: "#ef5350",
+            exercises: [ex("legPress", 4, 8, 120), ex("inclineChestPress", 4, 8, 105), ex("latPulldownWide", 4, 8, 105), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75), ex("calfRaise", 3, 14, 60)]
+          },
+          {
+            id: "w8b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Гак + плечи + спина",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 3, 10, 105), ex("shoulderPress", 4, 8, 105), ex("tBarRow", 3, 10, 105), ex("facePull", 3, 12, 60), ex("pecDeck", 3, 12, 60), ex("pallof", 3, 10, 45)]
+          },
+          {
+            id: "w8c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Финиш гипертрофии",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 3, 12, 90), ex("inclineChestPress", 3, 10, 90), ex("assistedPullUp", 3, 8, 90), ex("lateralRaise", 3, 14, 60), ex("cableCurl", 3, 12, 60), ex("tricepsPushdown", 3, 12, 60)]
+          }
+        ]
+      },
+      {
+        id: "w9",
+        week: 9,
+        phase: 3,
+        phaseLabel: "Фаза 3 · Сила",
+        label: "Силовой вход",
+        tag: "меньше повторов, больше отдыха, вес +10-15% от фазы 2 если RPE позволяет",
+        days: [
+          {
+            id: "w9a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Главные движения",
+            color: "#ef5350",
+            exercises: [ex("legPress", 5, 6, 150), ex("chestPress", 5, 6, 150), ex("latPulldownWide", 5, 6, 150), ex("cableCurl", 3, 8, 90), ex("tricepsPushdown", 3, 8, 90)]
+          },
+          {
+            id: "w9b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Гак + плечи + Т-гриф",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 4, 8, 135), ex("shoulderPress", 4, 6, 135), ex("tBarRow", 4, 8, 120), ex("facePull", 3, 10, 75), ex("calfRaise", 4, 12, 60)]
+          },
+          {
+            id: "w9c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Сила без добивания",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 4, 8, 120), ex("inclineChestPress", 4, 8, 120), ex("assistedPullUp", 4, 6, 120), ex("lateralRaise", 3, 12, 75), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75)]
+          }
+        ]
+      },
+      {
+        id: "w10",
+        week: 10,
+        phase: 3,
+        phaseLabel: "Фаза 3 · Сила",
+        label: "Силовая плотность",
+        tag: "стабильные паузы, чистые повторы",
+        days: [
+          {
+            id: "w10a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Жим ногами + жим груди",
+            color: "#ef5350",
+            exercises: [ex("legPress", 5, 6, 150), ex("chestPress", 5, 6, 150), ex("latPulldownWide", 5, 6, 150), ex("cableCurl", 3, 8, 90), ex("tricepsPushdown", 3, 8, 90)]
+          },
+          {
+            id: "w10b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Тяга и плечи",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 4, 8, 135), ex("shoulderPress", 4, 6, 135), ex("tBarRow", 4, 8, 120), ex("facePull", 3, 10, 75), ex("calfRaise", 4, 12, 60)]
+          },
+          {
+            id: "w10c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Наклонный жим + подтягивания",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 4, 8, 120), ex("inclineChestPress", 4, 8, 120), ex("assistedPullUp", 4, 6, 120), ex("lateralRaise", 3, 12, 75), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75)]
+          }
+        ]
+      },
+      {
+        id: "w11",
+        week: 11,
+        phase: 3,
+        phaseLabel: "Фаза 3 · Сила",
+        label: "Пик силы",
+        tag: "если RPE выше 8 — не добавляй вес",
+        days: [
+          {
+            id: "w11a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Основной силовой день",
+            color: "#ef5350",
+            exercises: [ex("legPress", 5, 6, 150), ex("chestPress", 5, 6, 150), ex("latPulldownWide", 5, 6, 150), ex("cableCurl", 3, 8, 90), ex("tricepsPushdown", 3, 8, 90)]
+          },
+          {
+            id: "w11b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Стабильная середина недели",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 4, 8, 135), ex("shoulderPress", 4, 6, 135), ex("tBarRow", 4, 8, 120), ex("facePull", 3, 10, 75), ex("calfRaise", 4, 12, 60)]
+          },
+          {
+            id: "w11c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Силовая техника",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 4, 8, 120), ex("inclineChestPress", 4, 8, 120), ex("assistedPullUp", 4, 6, 120), ex("lateralRaise", 3, 12, 75), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75)]
+          }
+        ]
+      },
+      {
+        id: "w12",
+        week: 12,
+        phase: 3,
+        phaseLabel: "Фаза 3 · Сила",
+        label: "Закрытие силы",
+        tag: "последняя тяжелая неделя перед разгрузкой",
+        days: [
+          {
+            id: "w12a",
+            type: "А",
+            typeLabel: "Тяжелая",
+            schedule: "Понедельник",
+            focus: "Итог главных движений",
+            color: "#ef5350",
+            exercises: [ex("legPress", 5, 6, 150), ex("chestPress", 5, 6, 150), ex("latPulldownWide", 5, 6, 150), ex("cableCurl", 3, 8, 90), ex("tricepsPushdown", 3, 8, 90)]
+          },
+          {
+            id: "w12b",
+            type: "Б",
+            typeLabel: "Средняя",
+            schedule: "Среда",
+            focus: "Последний силовой средний день",
+            color: "#f3a928",
+            exercises: [ex("hackSquat", 4, 8, 135), ex("shoulderPress", 4, 6, 135), ex("tBarRow", 4, 8, 120), ex("facePull", 3, 10, 75), ex("calfRaise", 4, 12, 60)]
+          },
+          {
+            id: "w12c",
+            type: "В",
+            typeLabel: "Легкая",
+            schedule: "Пятница",
+            focus: "Финиш силовой фазы",
+            color: "#2fc779",
+            exercises: [ex("legCurl", 4, 8, 120), ex("inclineChestPress", 4, 8, 120), ex("assistedPullUp", 4, 6, 120), ex("lateralRaise", 3, 12, 75), ex("hammerCurl", 3, 10, 75), ex("overheadTricep", 3, 10, 75)]
+          }
+        ]
+      },
+      {
+        id: "w13",
+        week: 13,
+        phase: 4,
+        phaseLabel: "Deload",
+        label: "Разгрузка",
+        tag: "объем -40%, вес -20%, восстановление важнее рекордов",
+        days: [
+          {
+            id: "w13a",
+            type: "А",
+            typeLabel: "Легко",
+            schedule: "Понедельник",
+            focus: "Ноги + грудь + спина легко",
+            color: "#32b6d8",
+            exercises: [ex("legPress", 2, 12, 75), ex("chestPress", 2, 12, 75), ex("latPulldown", 2, 12, 75)]
+          },
+          {
+            id: "w13b",
+            type: "Б",
+            typeLabel: "Легко",
+            schedule: "Среда",
+            focus: "Плечи + тяга + икры легко",
+            color: "#32b6d8",
+            exercises: [ex("shoulderPress", 2, 12, 75), ex("seatedRow", 2, 12, 75), ex("calfRaise", 2, 15, 45)]
+          },
+          {
+            id: "w13c",
+            type: "В",
+            typeLabel: "Легко",
+            schedule: "Пятница",
+            focus: "Задняя цепь + грудь + дельты легко",
+            color: "#32b6d8",
+            exercises: [ex("legCurl", 2, 12, 75), ex("pecDeck", 2, 12, 60), ex("lateralRaise", 2, 15, 45)]
           }
         ]
       }
@@ -1993,18 +3158,33 @@
     ];
 
     let state = loadState();
+    let userProfile = loadJson(PROFILE_KEY, null);
+    let exerciseData = loadJson(EXERCISE_DATA_KEY, {});
+    let workoutLog = loadJson(WORKOUT_LOG_KEY, []);
+    let streakStore = loadJson(STREAK_KEY, { freezes: {}, perfectWeeks: [] });
+    let bodyLog = loadJson(BODY_LOG_KEY, []);
+    let recoveryLog = loadJson(RECOVERY_KEY, []);
+    let remindersShown = loadJson(REMINDERS_SHOWN_KEY, {});
+    let saveHandle = null;
     let ui = {
-      activeTab: "workout",
+      activeTab: "today",
+      trainingMode: "gym",
       expanded: null,
       showWarmup: false,
       showStretch: true,
       celebrating: false,
       hasMounted: false,
-      toastTimer: null
+      toastTimer: null,
+      profileDraft: null,
+      pendingRecovery: null,
+      calendarDetail: null,
+      pullStartY: null,
+      pullDistance: 0
     };
 
     let tickHandle = null;
     let lastReminderToast = "";
+    let touchStart = null;
 
     function defaultState() {
       return {
@@ -2017,8 +3197,13 @@
         workoutFeeling: {},
         warmupDone: {},
         stretchDone: {},
+        homeDone: {},
+        yogaDone: {},
+        yogaProgress: {},
         completedWorkouts: {},
         daily: {},
+        remindersShown: {},
+        cycleCelebrated: {},
         timer: { total: 90, left: 90, running: false, label: "Отдых между подходами" },
         reminder: { enabled: false, nextAt: 0, intervalMin: 20 },
         trainingReminder: { enabled: false, nextAt: 0, hour: 17 }
@@ -2033,8 +3218,33 @@
       }
     }
 
-    function saveState() {
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function writeAllStores() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(EXERCISE_DATA_KEY, JSON.stringify(exerciseData));
+      localStorage.setItem(WORKOUT_LOG_KEY, JSON.stringify(workoutLog));
+      localStorage.setItem(STREAK_KEY, JSON.stringify(streakStore));
+      localStorage.setItem(BODY_LOG_KEY, JSON.stringify(bodyLog));
+      localStorage.setItem(RECOVERY_KEY, JSON.stringify(recoveryLog));
+      localStorage.setItem(REMINDERS_SHOWN_KEY, JSON.stringify(remindersShown));
+      if (userProfile) localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+    }
+
+    function saveState(immediate = false) {
+      clearTimeout(saveHandle);
+      if (immediate) {
+        writeAllStores();
+        return;
+      }
+      saveHandle = setTimeout(writeAllStores, 500);
     }
 
     function mutate(updater) {
@@ -2096,19 +3306,116 @@
     function getSetLog(weekIdx, dayIdx, exIdx, setIdx) {
       const key = setKey(weekIdx, dayIdx, exIdx, setIdx);
       const exData = prescribedExercise(weekIdx, dayIdx, exIdx);
+      const adaptive = getExerciseStore(exData.planId);
       const saved = state.logs[key] || {};
       return {
-        weight: saved.weight ?? "",
+        weight: saved.weight ?? adaptive.baseWeight ?? "",
         reps: saved.reps ?? exData.reps,
         done: !!saved.done,
         doneAt: saved.doneAt || "",
-        updatedAt: saved.updatedAt || ""
+        updatedAt: saved.updatedAt || "",
+        rpe: saved.rpe || ""
       };
     }
 
     function setLog(weekIdx, dayIdx, exIdx, setIdx, patch) {
       const key = setKey(weekIdx, dayIdx, exIdx, setIdx);
       state.logs[key] = { ...getSetLog(weekIdx, dayIdx, exIdx, setIdx), ...patch, updatedAt: new Date().toISOString() };
+    }
+
+    function getExerciseStore(exerciseId) {
+      if (!exerciseData[exerciseId]) {
+        exerciseData[exerciseId] = {
+          baseWeight: "",
+          lastRPE: null,
+          history: [],
+          personalBest: { weight: 0, reps: 0, volume: 0 }
+        };
+      }
+      return exerciseData[exerciseId];
+    }
+
+    function isWeightedExercise(exerciseId) {
+      return !["plank"].includes(exerciseId);
+    }
+
+    function numberValue(value) {
+      const parsed = Number(String(value ?? "").replace(",", "."));
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function weightStepFor(exerciseId) {
+      const data = EXERCISES[exerciseId] || {};
+      return data.muscles === "Ноги" ? 5 : 2.5;
+    }
+
+    function rpeOption(id) {
+      return RPE_OPTIONS.find(option => option.id === id) || RPE_OPTIONS[1];
+    }
+
+    function adaptiveWeightText(exerciseId) {
+      const store = getExerciseStore(exerciseId);
+      if (store.baseWeight === "" || store.baseWeight === undefined || store.baseWeight === null) {
+        return "Найди свой вес: 5 повторов с минимального веса, потом оцени RPE.";
+      }
+      const suffix = store.lastRPE ? ` · прошлый RPE ${store.lastRPE}` : "";
+      return `${store.baseWeight} кг базовый${suffix}`;
+    }
+
+    function saveSetRpe(weekIdx, dayIdx, exIdx, setIdx, rpeId) {
+      const planItem = PLAN[weekIdx].days[dayIdx].exercises[exIdx];
+      const option = rpeOption(rpeId);
+      const log = getSetLog(weekIdx, dayIdx, exIdx, setIdx);
+      const weight = numberValue(log.weight) ?? 0;
+      const reps = numberValue(log.reps) ?? 0;
+      const store = getExerciseStore(planItem.id);
+      const step = weightStepFor(planItem.id);
+      let recommendation = weight;
+      const previousBestWeight = Number(store.personalBest?.weight || 0);
+
+      if (option.value <= 4) recommendation = weight + Math.max(5, step);
+      if (option.value >= 8 && option.value < 10) recommendation = Math.max(0, weight - Math.max(5, step));
+      if (option.value >= 10) recommendation = Math.max(0, weight - 10);
+      if (option.value >= 5 && option.value <= 7) store.baseWeight = weight;
+      if (option.value <= 6 && store.baseWeight !== "" && weight >= Number(store.baseWeight)) {
+        recommendation = weight + step;
+      }
+
+      store.lastRPE = option.value;
+      store.history = [
+        ...(store.history || []),
+        {
+          date: new Date().toISOString(),
+          setKey: setKey(weekIdx, dayIdx, exIdx, setIdx),
+          weight,
+          reps,
+          rpe: option.value,
+          feeling: option.id,
+          recommendation
+        }
+      ].slice(-40);
+      const volume = weight * reps;
+      const best = store.personalBest || { weight: 0, reps: 0, volume: 0 };
+      store.personalBest = {
+        weight: Math.max(best.weight || 0, weight),
+        reps: Math.max(best.reps || 0, reps),
+        volume: Math.max(best.volume || 0, volume)
+      };
+      const prBeat = weight > previousBestWeight;
+      setLog(weekIdx, dayIdx, exIdx, setIdx, { rpe: option.id });
+      workoutLog.push({
+        type: "set",
+        date: new Date().toISOString(),
+        exerciseId: planItem.id,
+        exerciseName: EXERCISES[planItem.id]?.name || planItem.id,
+        weight,
+        reps,
+        rpe: option.value,
+        recommendation,
+        prBeat,
+        xp: XP_TABLE.set + (prBeat ? XP_TABLE.prBeat : 0)
+      });
+      return { option, recommendation };
     }
 
     function exerciseProgress(weekIdx, dayIdx, exIdx) {
@@ -2144,6 +3451,42 @@
         total += p.totalSets;
       });
       return total ? Math.round((done / total) * 100) : 0;
+    }
+
+    function phaseMeta(week = currentWeek()) {
+      if (week.phase === 2) return { id: 2, label: "Фаза 2", title: "Гипертрофия", desc: "Больше объема, новые упражнения.", color: "var(--amber)" };
+      if (week.phase === 3) return { id: 3, label: "Фаза 3", title: "Сила", desc: "Меньше повторов, больше вес.", color: "var(--red)" };
+      if (week.phase === 4) return { id: 4, label: "Deload", title: "Восстановление", desc: "Легкая неделя: объем -40%, вес -20%.", color: "var(--cyan)" };
+      return { id: 1, label: "Фаза 1", title: "Адаптация", desc: "Техника, легкий вес, спокойный темп.", color: "var(--green)" };
+    }
+
+    function phaseGroups() {
+      return [
+        { label: "Фаза 1", range: "1-4", indexes: [0, 1, 2, 3] },
+        { label: "Фаза 2", range: "5-8", indexes: [4, 5, 6, 7] },
+        { label: "Фаза 3", range: "9-12", indexes: [8, 9, 10, 11] },
+        { label: "Deload", range: "13", indexes: [12] }
+      ];
+    }
+
+    function cycleInfo() {
+      const cycleLength = 13;
+      const completedWeeks = Object.keys(state.completedWorkouts || {}).filter(key => {
+        const week = PLAN.find(item => key.startsWith(`${item.id}-`));
+        if (!week) return false;
+        const weekIndex = PLAN.indexOf(week);
+        return weekIndex >= 0 && weekIndex < cycleLength;
+      });
+      const unique = new Set(completedWeeks.map(key => key.split("-")[0]));
+      return { cycleLength, completedWeeks: unique.size, complete: unique.size >= cycleLength };
+    }
+
+    function phaseToast(weekIdx) {
+      const week = PLAN[weekIdx];
+      if (!week) return;
+      if (week.week === 5) showToast("Фаза 2 — Гипертрофия", "Больше объема, новые упражнения.");
+      if (week.week === 9) showToast("Фаза 3 — Сила", "Меньше повторов, больше вес.");
+      if (week.week === 13) showToast("Deload", "Дай телу восстановиться. Легкая неделя.");
     }
 
     function monthId(date = new Date()) {
@@ -2311,8 +3654,8 @@
     }
 
     function muscleMapForWeek() {
-      const start = startOfWeek();
-      const end = addDays(start, 7);
+      const end = new Date();
+      const start = addDays(end, -7);
       const result = {};
       allSetEntries().forEach(entry => {
         const log = state.logs[entry.setKey];
@@ -2330,10 +3673,10 @@
 
     function progressionSuggestion(weekIdx, dayIdx, exIdx) {
       const base = prescribedExercise(weekIdx, dayIdx, exIdx);
+      const store = getExerciseStore(base.planId);
       const progress = exerciseProgress(weekIdx, dayIdx, exIdx);
       if (!progress.complete) return null;
-      const rating = state.ratings[exerciseKey(weekIdx, dayIdx, exIdx)];
-      if (rating === "hard" || rating === "pain") return null;
+      if (!store.lastRPE || store.lastRPE >= 8) return null;
       let totalWeight = 0;
       let count = 0;
       let allRepsMet = true;
@@ -2348,9 +3691,10 @@
         if (Number.isFinite(reps) && reps < Number(base.reps)) allRepsMet = false;
       }
       if (!allRepsMet || count === 0) return null;
-      const step = base.muscles === "Ноги" ? 5 : 2.5;
+      const step = store.lastRPE <= 6 ? weightStepFor(base.planId) : 0;
+      if (!step) return null;
       const avg = totalWeight / count;
-      return { step, next: Math.round((avg + step) * 10) / 10, rating: rating || "ok" };
+      return { step, next: Math.round((avg + step) * 10) / 10, rating: store.lastRPE };
     }
 
     function currentProgressionSuggestions() {
@@ -2365,20 +3709,99 @@
       const perfectWeeks = perfectWeeksThisMonth();
       const daily = dailyState();
       const badges = unlockedAchievements(month, daily);
-      const xp = month.workouts * 120 + month.sets * 8 + perfectWeeks * 90 + badges.length * 60;
+      const activity = activityStatsThisWeek();
+      const homeCount = workoutLog.filter(item => item.type === "home").length;
+      const yogaCount = workoutLog.filter(item => item.type === "yoga").length;
+      const bodyWeightCount = bodyLog.length;
+      const prCount = workoutLog.filter(item => item.prBeat).length;
+      const completedPhases = [1, 2, 3].filter(phase => phaseCompletion(phase).complete).length;
+      const deloadDone = phaseCompletion(4).complete ? 1 : 0;
+      const fullCycleDone = completedPhases === 3 && deloadDone ? 1 : 0;
+      const xp =
+        month.workouts * XP_TABLE.gymWorkout +
+        month.sets * XP_TABLE.set +
+        homeCount * XP_TABLE.homeWorkout +
+        yogaCount * XP_TABLE.yoga +
+        bodyWeightCount * XP_TABLE.bodyWeightLog +
+        prCount * XP_TABLE.prBeat +
+        (daily.water >= 6 ? XP_TABLE.waterGoal : 0) +
+        completedPhases * XP_TABLE.phaseComplete +
+        deloadDone * XP_TABLE.deloadComplete +
+        fullCycleDone * XP_TABLE.fullCycleComplete +
+        perfectWeeks * 90;
       const level = Math.floor(xp / 500) + 1;
       const levelXp = xp % 500;
-      return { month, streak, perfectWeeks, currentWeekCount: currentWeekWorkoutCount(), badges, xp, level, levelXp, nextLevel: 500 - levelXp };
+      const levelName = LEVEL_NAMES[Math.min(LEVEL_NAMES.length - 1, level - 1)];
+      return { month, streak, perfectWeeks, currentWeekCount: currentWeekWorkoutCount(), badges, xp, level, levelName, levelXp, nextLevel: 500 - levelXp, activity, completedPhases, fullCycleDone };
+    }
+
+    function phaseCompletion(phase) {
+      const weeks = PLAN.filter(week => week.phase === phase);
+      const completedWeeks = weeks.filter(week => week.days.every(day => state.completedWorkouts[`${week.id}-${day.id}`]));
+      return { done: completedWeeks.length, total: weeks.length, complete: weeks.length > 0 && completedWeeks.length === weeks.length };
+    }
+
+    function activityStatsThisWeek() {
+      const start = startOfWeek();
+      const end = addDays(start, 7);
+      const inWeek = iso => {
+        const date = new Date(iso);
+        return date >= start && date < end;
+      };
+      const gym = completedWorkoutEntries().filter(item => inWeek(item.completedAt)).length;
+      const home = workoutLog.filter(item => item.type === "home" && item.completedAt && inWeek(item.completedAt)).length;
+      const yoga = workoutLog.filter(item => item.type === "yoga" && item.completedAt && inWeek(item.completedAt)).length;
+      return { gym, home, yoga };
+    }
+
+    function recoveryScore() {
+      const weights = { tired: -2, normal: 0, good: 1, great: 2 };
+      const recent = [...recoveryLog].sort((a, b) => (b.loggedAt || "").localeCompare(a.loggedAt || "")).slice(0, 3);
+      let score = 70;
+      recent.forEach(item => {
+        score += (weights[item.feeling] ?? 0) * 10;
+      });
+      if (recent.length >= 2) {
+        const last = new Date(recent[0].loggedAt).getTime();
+        const prev = new Date(recent[1].loggedAt).getTime();
+        if (Number.isFinite(last) && Number.isFinite(prev) && Math.abs(last - prev) < 7 * 60 * 60 * 1000) score -= 15;
+      }
+      const value = Math.max(0, Math.min(100, Math.round(score)));
+      const label = value < 30 ? "Нужен отдых" : value < 60 ? "Средне" : "Готов";
+      const color = value < 30 ? "var(--red)" : value < 60 ? "var(--amber)" : "var(--green)";
+      return { value, label, color };
+    }
+
+    function renderRecoveryBar() {
+      const recovery = recoveryScore();
+      return `
+        <div class="recovery-bar ${recovery.value < 30 ? "warning" : ""}">
+          <span class="recovery-label">🔋 Восстановление</span>
+          <div class="recovery-track"><div class="recovery-fill" style="width:${recovery.value}%;background:${recovery.color}"></div></div>
+          <span class="recovery-value">${recovery.value}% · ${escapeHtml(recovery.label)}</span>
+          ${recovery.value < 30 ? `<small>Похоже, ты устал. Может, легкая йога вместо зала?</small>` : ""}
+        </div>
+      `;
     }
 
     function unlockedAchievements(month = monthStats(), daily = dailyState()) {
       const unlocked = [];
+      const homeCount = workoutLog.filter(item => item.type === "home").length;
+      const yogaCount = workoutLog.filter(item => item.type === "yoga").length;
       if (month.workouts >= 1) unlocked.push("first");
+      if (currentWeekWorkoutCount() >= 3) unlocked.push("week1");
       if (perfectWeeksThisMonth() >= 1) unlocked.push("perfectWeek");
+      if (phaseCompletion(1).complete) unlocked.push("phase1");
+      if (phaseCompletion(2).complete) unlocked.push("phase2");
+      if (phaseCompletion(3).complete) unlocked.push("phase3");
+      if (phaseCompletion(4).complete) unlocked.push("fullCycle");
       if (month.workouts >= 8) unlocked.push("month8");
       if (month.volume >= 10000) unlocked.push("volume10k");
       if ((daily.water || 0) >= 6) unlocked.push("hydrated");
       if (month.workouts > 0 && missedScheduledDaysThisMonth() === 0) unlocked.push("noMiss");
+      if (workoutLog.some(item => item.prBeat)) unlocked.push("prBeat");
+      if (yogaCount >= 7) unlocked.push("yoga7");
+      if (homeCount >= 10) unlocked.push("home10");
       return unlocked;
     }
 
@@ -2392,6 +3815,28 @@
         return `${SCHEDULE_DAYS[date.getDay()]} · ${date.toLocaleDateString("ru-RU", { day: "2-digit", month: "short" })}`;
       }
       return "план закрыт";
+    }
+
+    function nextWorkoutPrompt() {
+      const label = nextWorkoutLabel();
+      if (label === "план закрыт") return "Полный цикл закрыт. Можно повторить программу с новыми рабочими весами.";
+      return `Следующая по плану: ${label}. Я напомню про еду, воду и сумку.`;
+    }
+
+    function celebrateCycleIfReady() {
+      const deloadDone = phaseCompletion(4).complete;
+      if (!deloadDone || state.cycleCelebrated.fullCycle) return false;
+      mutate(draft => {
+        draft.cycleCelebrated.fullCycle = new Date().toISOString();
+      });
+      ui.celebrating = true;
+      haptic([35, 35, 35, 70]);
+      showToast("Полный цикл закрыт", `13 недель готовы · +${XP_TABLE.fullCycleComplete} XP в статистике.`);
+      setTimeout(() => {
+        ui.celebrating = false;
+        render();
+      }, 1800);
+      return true;
     }
 
     function dailyState() {
@@ -2522,8 +3967,50 @@
       }
     }
 
+    function checkSmartReminders() {
+      if (!userProfile || ui.pendingRecovery) return;
+      const now = Date.now();
+      const twoHours = 2 * 60 * 60 * 1000;
+      for (const reminder of SMART_REMINDERS) {
+        const last = Number(remindersShown[reminder.id] || 0);
+        if (now - last < twoHours) continue;
+        let ok = false;
+        try {
+          ok = Boolean(reminder.check());
+        } catch (error) {
+          ok = false;
+        }
+        if (!ok) continue;
+        const message = typeof reminder.message === "function" ? reminder.message() : reminder.message;
+        if (!message) continue;
+        remindersShown[reminder.id] = now;
+        state.remindersShown[reminder.id] = now;
+        saveState(true);
+        showToast(reminder.title, message);
+        break;
+      }
+    }
+
     function haptic(pattern = 18) {
       if ("vibrate" in navigator) navigator.vibrate(pattern);
+    }
+
+    function queueRecoveryPrompt(type, key, title) {
+      setTimeout(() => {
+        ui.pendingRecovery = { type, key, title };
+        render();
+      }, 1200);
+    }
+
+    function moveTab(direction) {
+      if (!userProfile) return;
+      const tabs = ["today", "training", "progress", "nutrition"];
+      const current = tabs.indexOf(ui.activeTab);
+      const next = Math.max(0, Math.min(tabs.length - 1, current + direction));
+      if (next !== current) {
+        ui.activeTab = tabs[next];
+        render();
+      }
     }
 
     function icon(name) {
@@ -2543,32 +4030,39 @@
       const progress = progressStats();
       const app = document.getElementById("app");
       app.classList.toggle("motion-settled", ui.hasMounted);
+      if (!userProfile) {
+        app.innerHTML = renderOnboarding();
+        document.getElementById("floating-root").innerHTML = "";
+        bindEvents();
+        return;
+      }
       app.innerHTML = `
         <header class="topbar">
           <div>
-            <p class="eyebrow">Full body · тренажерный зал</p>
-            <h1>Зал-помощник</h1>
-            <p class="top-copy">4 недели, 3 тренировки в неделю, стрик по плану, награды, журнал веса и умный отдых между подходами.</p>
+            <p class="eyebrow">Gymper · твой личный зал</p>
+            <h1>Сегодня — ${escapeHtml(weekdayName())}, ${escapeHtml(todayPlan().label)}</h1>
+            <p class="top-copy">Зал по плану 3 раза в неделю, дом во вторник/четверг, йога каждое утро, RPE и вес начинаются с минимума.</p>
           </div>
           <div class="month-stat">
             <strong>${progress.streak}</strong>
-            <span>недель стрика · уровень ${progress.level}</span>
+            <span>недель стрика · уровень ${progress.level} · ${escapeHtml(progress.levelName)}</span>
           </div>
         </header>
         <nav class="nav-tabs" aria-label="Разделы">
-          ${tabButton("workout", "dumbbell", "Тренировка")}
-          ${tabButton("diary", "book", "Журнал")}
+          ${tabButton("today", "target", "Сегодня")}
+          ${tabButton("training", "dumbbell", "Тренировка")}
           ${tabButton("progress", "flame", "Прогресс")}
-          ${tabButton("stats", "chart", "База")}
+          ${tabButton("nutrition", "water", "Питание")}
         </nav>
-        ${ui.activeTab === "workout" ? renderWorkoutTab() : ""}
-        ${ui.activeTab === "diary" ? renderDiaryTab() : ""}
+        ${ui.activeTab === "today" ? renderTodayTab() : ""}
+        ${ui.activeTab === "training" ? renderTrainingTab() : ""}
         ${ui.activeTab === "progress" ? renderProgressTab() : ""}
-        ${ui.activeTab === "stats" ? renderStatsTab() : ""}
+        ${ui.activeTab === "nutrition" ? renderNutritionTab() : ""}
       `;
-      document.getElementById("floating-root").innerHTML = `${renderMiniTimer()}${ui.celebrating ? renderConfetti() : ""}`;
+      document.getElementById("floating-root").innerHTML = `${renderPullIndicator()}${renderMiniTimer()}${ui.celebrating ? renderConfetti() : ""}${renderRecoveryOverlay()}`;
       bindEvents();
       ensureTicker();
+      setTimeout(checkSmartReminders, 450);
       if (!ui.hasMounted) {
         ui.hasMounted = true;
         setTimeout(() => app.classList.add("motion-settled"), 460);
@@ -2577,6 +4071,310 @@
 
     function tabButton(id, iconName, label) {
       return `<button type="button" class="${ui.activeTab === id ? "active" : ""}" data-action="tab" data-tab="${id}">${icon(iconName)}<span>${label}</span></button>`;
+    }
+
+    function renderOnboarding() {
+      const draft = profileDraft();
+      return `
+        <section class="onboarding">
+          <div class="panel">
+            <p class="eyebrow">Первый запуск</p>
+            <h1>Добро пожаловать в Gymper</h1>
+            <p class="top-copy">Вес в упражнениях начинается с нуля/минимума. Приложение будет подбирать рабочий вес по RPE 6-7, а не бросать тебя под 40 кг.</p>
+            <div class="onboarding-grid">
+              <label>
+                <span class="subtle">Имя</span>
+                <input type="text" autocomplete="off" inputmode="text" placeholder="можно пустым" data-profile-field="name" value="${escapeAttr(draft.name)}">
+              </label>
+              <label>
+                <span class="subtle">Вес, кг</span>
+                <input type="number" min="0" max="250" step="0.5" inputmode="decimal" autocomplete="off" placeholder="70" data-profile-field="bodyWeight" value="${escapeAttr(draft.bodyWeight)}">
+              </label>
+            </div>
+            <div class="section-title" style="margin-top:14px">
+              <h2>Опыт</h2>
+              <small>для фильтра упражнений</small>
+            </div>
+            <div class="rpe-grid">
+              ${["Новичок", "После перерыва", "Уверенный", "Продвинутый"].map(item => `
+                <button type="button" class="rpe-button ${draft.experience === item ? "active" : ""}" style="--rpe:var(--green)" data-action="profile-experience" data-value="${escapeAttr(item)}">${escapeHtml(item)}</button>
+              `).join("")}
+            </div>
+            <div class="section-title" style="margin-top:14px">
+              <h2>Дни зала</h2>
+              <small>стрик считается по плану</small>
+            </div>
+            <div class="day-grid">
+              ${[
+                ["1", "Понедельник"], ["3", "Среда"], ["5", "Пятница"]
+              ].map(([day, label]) => `
+                <button type="button" class="day-card ${draft.gymDays.includes(Number(day)) ? "active" : ""}" style="--accent:var(--green)" data-action="profile-day" data-day="${day}">
+                  <strong>${escapeHtml(label.slice(0, 2))}</strong>
+                  <span>${escapeHtml(label)}</span>
+                </button>
+              `).join("")}
+            </div>
+            <button type="button" class="finish-button" data-action="save-profile">${icon("check")}Начать</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function profileDraft() {
+      if (!ui.profileDraft) {
+        ui.profileDraft = {
+          name: "",
+          bodyWeight: "70",
+          experience: "После перерыва",
+          gymDays: [1, 3, 5]
+        };
+      }
+      return ui.profileDraft;
+    }
+
+    function syncProfileDraftFromDom() {
+      document.querySelectorAll("[data-profile-field]").forEach(input => {
+        profileDraft()[input.dataset.profileField] = input.value;
+      });
+    }
+
+    function weekdayName(date = new Date()) {
+      return date.toLocaleDateString("ru-RU", { weekday: "long" });
+    }
+
+    function todayPlan(date = new Date()) {
+      return PLAN_BY_WEEKDAY[date.getDay()] || PLAN_BY_WEEKDAY[0];
+    }
+
+    function todayYogaProgram(date = new Date()) {
+      return YOGA_PROGRAMS.find(item => item.day === date.getDay()) || YOGA_PROGRAMS[0];
+    }
+
+    function currentHomeWorkout(date = new Date()) {
+      const plan = todayPlan(date);
+      const slot = plan.slot || (date.getDay() === 4 ? "thu" : "tue");
+      const yearStart = startOfWeek(new Date(date.getFullYear(), 0, 1));
+      const weekNo = Math.floor((startOfWeek(date) - yearStart) / (7 * 24 * 60 * 60 * 1000));
+      const candidates = HOME_WORKOUTS.filter(item => item.slot === slot);
+      return candidates[Math.abs(weekNo) % candidates.length] || HOME_WORKOUTS[0];
+    }
+
+    function homeSetKey(workoutId, roundIdx, exIdx, date = TODAY_KEY) {
+      return `${date}-${workoutId}-r${roundIdx}-e${exIdx}`;
+    }
+
+    function homeProgress(workout = currentHomeWorkout()) {
+      let done = 0;
+      const total = 3 * workout.exercises.length;
+      for (let roundIdx = 0; roundIdx < 3; roundIdx++) {
+        workout.exercises.forEach((_, exIdx) => {
+          if (state.homeDone[homeSetKey(workout.id, roundIdx, exIdx)]) done++;
+        });
+      }
+      return { done, total, pct: total ? Math.round((done / total) * 100) : 0, complete: done === total };
+    }
+
+    function yogaDayState(program = todayYogaProgram()) {
+      if (!state.yogaProgress[TODAY_KEY]) {
+        state.yogaProgress[TODAY_KEY] = { programId: program.name, poseIdx: 0, done: false };
+      }
+      return state.yogaProgress[TODAY_KEY];
+    }
+
+    function renderTodayTab() {
+      const plan = todayPlan();
+      const yoga = todayYogaProgram();
+      const gymDayIdx = plan.type === "gym" ? plan.dayIdx : state.dayIdx;
+      const gymProgress = workoutProgress(state.weekIdx, gymDayIdx);
+      const home = currentHomeWorkout();
+      const homeStats = homeProgress(home);
+      const yogaState = yogaDayState(yoga);
+      return `
+        <div class="layout">
+          <section class="stack">
+            <div class="workout-head today-hero" style="--accent:${plan.type === "gym" ? currentWeek().days[gymDayIdx].color : plan.type === "home" ? "var(--cyan)" : "var(--green)"}; --pct:${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%">
+              <div>
+                <p class="eyebrow">${escapeHtml(new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "long" }))}</p>
+                <h2>${escapeHtml(plan.label)} по плану</h2>
+                <div class="workout-meta">
+                  <span class="pill">${icon("stretch")}Йога каждое утро</span>
+                  <span class="pill">${plan.type === "gym" ? `${gymProgress.doneSets}/${gymProgress.totalSets} подходов` : plan.type === "home" ? `${homeStats.done}/${homeStats.total} кругов/упр.` : "мягкое восстановление"}</span>
+                  <span class="pill">RPE цель 6-7</span>
+                </div>
+              </div>
+              <div class="progress-ring" style="--accent:var(--green); --pct:${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%"><span>${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%</span></div>
+            </div>
+            ${renderRecoveryBar()}
+
+            <div class="today-grid">
+              ${todayCard("yoga", "stretch", "Йога", yoga.name, yogaState.done ? "готово" : `${yoga.poses.length} поз`, "var(--green)")}
+              ${todayCard(plan.type, plan.type === "gym" ? "dumbbell" : plan.type === "home" ? "activity" : "shield", plan.label, plan.type === "gym" ? currentWeek().days[gymDayIdx].focus : plan.type === "home" ? home.name : "Растяжка и прогулка", plan.type === "gym" ? `${gymProgress.doneSets}/${gymProgress.totalSets}` : plan.type === "home" ? `${homeStats.done}/${homeStats.total}` : "легко", plan.type === "gym" ? currentWeek().days[gymDayIdx].color : "var(--cyan)")}
+              ${todayCard("nutrition", "water", "Питание", "вода, еда до тренировки, белок после", `${dailyState().water}/6 воды`, "var(--cyan)")}
+            </div>
+          </section>
+          <aside class="stack side-column">
+            ${renderTimerPanel()}
+            ${renderNutritionPanel()}
+            ${renderIphonePanel(progressStats())}
+          </aside>
+        </div>
+      `;
+    }
+
+    function todayCard(mode, iconName, title, text, meta, color) {
+      return `
+        <button type="button" class="today-card" style="--accent:${color}" data-action="today-open" data-mode="${mode}">
+          <span class="muscle-dot">${icon(iconName)}</span>
+          <span>
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(text)}</span>
+            <em>${escapeHtml(meta)}</em>
+          </span>
+        </button>
+      `;
+    }
+
+    function renderTrainingTab() {
+      return `
+        <section class="mode-shell">
+          <div class="mode-tabs">
+            ${modeButton("gym", "dumbbell", "Зал")}
+            ${modeButton("home", "activity", "Дом")}
+            ${modeButton("yoga", "stretch", "Йога")}
+          </div>
+        </section>
+        ${ui.trainingMode === "gym" ? renderWorkoutTab() : ""}
+        ${ui.trainingMode === "home" ? renderHomeTrainingTab() : ""}
+        ${ui.trainingMode === "yoga" ? renderYogaTrainingTab() : ""}
+      `;
+    }
+
+    function modeButton(id, iconName, label) {
+      return `<button type="button" class="${ui.trainingMode === id ? "active" : ""}" data-action="mode" data-mode="${id}">${icon(iconName)}${escapeHtml(label)}</button>`;
+    }
+
+    function renderHomeTrainingTab() {
+      const workout = currentHomeWorkout();
+      const progress = homeProgress(workout);
+      return `
+        <div class="layout">
+          <section class="stack">
+            <div class="workout-head" style="--accent:var(--cyan); --pct:${progress.pct}%">
+              <div>
+                <p class="eyebrow">Дом · 3 круга · 40/20</p>
+                <h2>${escapeHtml(workout.name)}</h2>
+                <div class="workout-meta">
+                  <span class="pill">${escapeHtml(workout.focus)}</span>
+                  <span class="pill">${progress.done}/${progress.total} отмечено</span>
+                  <span class="pill">20-30 мин</span>
+                </div>
+              </div>
+              <div class="progress-ring" style="--accent:var(--cyan); --pct:${progress.pct}%"><span>${progress.pct}%</span></div>
+            </div>
+            ${Array.from({ length: 3 }, (_, roundIdx) => `
+              <section class="panel">
+                <div class="section-title">
+                  <h2>Круг ${roundIdx + 1}</h2>
+                  <small>40 сек работа · 20 сек отдых</small>
+                </div>
+                <div class="check-list">
+                  ${workout.exercises.map((name, exIdx) => {
+                    const key = homeSetKey(workout.id, roundIdx, exIdx);
+                    const done = !!state.homeDone[key];
+                    return `
+                      <div class="home-row">
+                        <button type="button" class="check-box ${done ? "done" : ""}" data-action="home-check" data-key="${key}" title="Отметить">${done ? ICONS.check : ""}</button>
+                        <span>${escapeHtml(name)}</span>
+                        <button type="button" class="icon-button" data-action="home-timer" title="40 секунд">${ICONS.timer}</button>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </section>
+            `).join("")}
+            <section class="panel">
+              <button type="button" class="finish-button ${progress.complete ? "complete" : ""}" data-action="home-finish" ${progress.complete ? "" : "disabled"}>${icon("check")}Домашняя тренировка готова</button>
+            </section>
+          </section>
+          <aside class="stack side-column">
+            ${renderTimerPanel()}
+            ${renderNutritionPanel()}
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderYogaTrainingTab() {
+      const program = todayYogaProgram();
+      const yState = yogaDayState(program);
+      const activePose = program.poses[Math.min(yState.poseIdx, program.poses.length - 1)];
+      const pct = yState.done ? 100 : Math.round((yState.poseIdx / program.poses.length) * 100);
+      return `
+        <div class="layout">
+          <section class="stack">
+            <div class="workout-head" style="--accent:var(--green); --pct:${pct}%">
+              <div>
+                <p class="eyebrow">Йога · 10-15 минут</p>
+                <h2>${escapeHtml(program.name)}</h2>
+                <div class="workout-meta">
+                  <span class="pill">${yState.done ? "готово" : `поза ${Math.min(yState.poseIdx + 1, program.poses.length)}/${program.poses.length}`}</span>
+                  <span class="pill">${activePose ? `${activePose[1]} сек` : "готово"}</span>
+                </div>
+              </div>
+              <div class="progress-ring" style="--accent:var(--green); --pct:${pct}%"><span>${pct}%</span></div>
+            </div>
+            <section class="panel yoga-focus">
+              <div class="yoga-icon">${icon(program.icon)}</div>
+              <h2>${escapeHtml(activePose ? activePose[0] : "Практика готова")}</h2>
+              <div class="compact-actions">
+                ${activePose ? `<button type="button" data-action="yoga-start-pose" data-seconds="${activePose[1]}" data-label="${escapeAttr(activePose[0])}">${icon("timer")}Таймер позы</button>` : ""}
+                <button type="button" data-action="yoga-next">${yState.done ? "Сбросить" : "Следующая поза"}</button>
+                <a class="button" href="${escapeAttr(program.youtube)}" target="_blank" rel="noreferrer">${icon("video")}YouTube</a>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="check-list">
+                ${program.poses.map(([name, seconds], idx) => `
+                  <div class="check-item">
+                    <button type="button" class="check-box ${yState.done || idx < yState.poseIdx ? "done" : ""}" data-action="yoga-jump" data-pose="${idx}" title="Перейти">${yState.done || idx < yState.poseIdx ? ICONS.check : ""}</button>
+                    <span>${escapeHtml(name)} · ${seconds} сек</span>
+                  </div>
+                `).join("")}
+              </div>
+              <button type="button" class="finish-button ${yState.done ? "complete" : ""}" data-action="yoga-finish">${icon("check")}${yState.done ? "Йога записана" : "Завершить йогу"}</button>
+            </section>
+          </section>
+          <aside class="stack side-column">
+            ${renderTimerPanel()}
+            ${renderQuickStats()}
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderNutritionTab() {
+      return `
+        <div class="layout">
+          <section class="stack">
+            ${renderNutritionPanel()}
+            <section class="panel">
+              <div class="section-title">
+                <h2>${icon("food")}Мини-план дня</h2>
+                <small>простые напоминалки</small>
+              </div>
+              <div class="check-list">
+                ${["За 1-2 часа до тренировки: нормальная еда, не пустой желудок.", "Во время тренировки: вода маленькими глотками.", "После: белок и обычная еда, без паники и наказаний.", "Если болит сустав или резкая боль: снизь вес и запиши RPE 10."].map(item => `
+                  <div class="check-item"><span class="check-box done">${ICONS.check}</span><span>${escapeHtml(item)}</span></div>
+                `).join("")}
+              </div>
+            </section>
+          </section>
+          <aside class="stack side-column">
+            ${renderIphonePanel(progressStats())}
+            ${renderExportPanel()}
+          </aside>
+        </div>
+      `;
     }
 
     function renderWorkoutTab() {
@@ -2588,18 +4386,10 @@
           <section class="stack">
             <div class="panel">
               <div class="section-title">
-                <h2>Неделя</h2>
+                <h2>${escapeHtml(phaseMeta(week).label)} · ${escapeHtml(phaseMeta(week).title)}</h2>
                 <small>${escapeHtml(week.tag)}</small>
               </div>
-              <div class="week-grid">
-                ${PLAN.map((item, idx) => `
-                  <button type="button" class="week-card ${idx === state.weekIdx ? "active" : ""}" data-action="week" data-week="${idx}">
-                    <span class="num">${item.week}</span>
-                    <span class="label">${escapeHtml(item.label)}</span>
-                    <div class="tiny-bar"><span style="width:${weekProgress(idx)}%"></span></div>
-                  </button>
-                `).join("")}
-              </div>
+              ${renderPhaseWeekSelector()}
             </div>
 
             <div class="panel">
@@ -2653,6 +4443,34 @@
             ${renderQuickStats()}
             ${renderNutritionPanel()}
           </aside>
+        </div>
+      `;
+    }
+
+    function renderPhaseWeekSelector() {
+      return `
+        <div class="phase-grid">
+          ${phaseGroups().map(group => `
+            <div class="phase-group ${group.indexes.includes(state.weekIdx) ? "active" : ""}">
+              <div class="phase-group-head">
+                <strong>${escapeHtml(group.label)}</strong>
+                <span>${escapeHtml(group.range)}</span>
+              </div>
+              <div class="week-grid">
+                ${group.indexes.map(idx => {
+                  const item = PLAN[idx];
+                  if (!item) return "";
+                  return `
+                    <button type="button" class="week-card ${idx === state.weekIdx ? "active" : ""}" data-action="week" data-week="${idx}">
+                      <span class="num">${item.week}</span>
+                      <span class="label">${escapeHtml(item.label)}</span>
+                      <div class="tiny-bar"><span style="width:${weekProgress(idx)}%"></span></div>
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          `).join("")}
         </div>
       `;
     }
@@ -2719,13 +4537,13 @@
         <div class="exercise-detail">
           <div class="detail-grid">
             <div class="metric"><small>Тренажер</small><strong>${escapeHtml(exData.machine)}</strong></div>
-            <div class="metric"><small>Стартовый вес</small><strong>${escapeHtml(exData.startWeight)}</strong></div>
+            <div class="metric"><small>Рабочий вес</small><strong>${escapeHtml(adaptiveWeightText(base.planId))}</strong></div>
             <div class="metric"><small>Отдых</small><strong>${formatTimer(base.restSec)}</strong></div>
           </div>
 
           <div class="cue-list">
             <div><strong style="color:var(--text)">Техника:</strong> ${escapeHtml(exData.tip)}</div>
-            ${exData.cues.map(cue => `<div>• ${escapeHtml(cue)}</div>`).join("")}
+            ${(exData.cues || []).map(cue => `<div>• ${escapeHtml(cue)}</div>`).join("")}
           </div>
 
           <div class="detail-actions">
@@ -2744,7 +4562,7 @@
             </div>
           </div>
 
-          ${renderRpeBlock(weekIdx, dayIdx, exIdx)}
+          ${renderExerciseHistoryBlock(weekIdx, dayIdx, exIdx)}
           ${renderProgressionBlock(weekIdx, dayIdx, exIdx, exData)}
 
           <div>
@@ -2768,22 +4586,33 @@
       `;
     }
 
-    function renderRpeBlock(weekIdx, dayIdx, exIdx) {
-      const eKey = exerciseKey(weekIdx, dayIdx, exIdx);
-      const selected = state.ratings[eKey];
+    function renderExerciseHistoryBlock(weekIdx, dayIdx, exIdx) {
+      const exerciseId = PLAN[weekIdx].days[dayIdx].exercises[exIdx].id;
+      const store = getExerciseStore(exerciseId);
+      const history = (store.history || []).slice(-5).reverse();
+      const points = history.slice().reverse().map(item => Math.min(100, Math.round(((item.weight || 0) / Math.max(1, store.personalBest?.weight || item.weight || 1)) * 100)));
       return `
         <div>
           <div class="section-title">
-            <h3>Сложность</h3>
-            <small>для автопрогрессии</small>
+            <h3>Дневник упражнения</h3>
+            <small>${history.length ? "последние 5 подходов" : "появится после RPE"}</small>
           </div>
-          <div class="rpe-grid">
-            ${RPE_OPTIONS.map(option => `
-              <button type="button" class="rpe-button ${selected === option.id ? "active" : ""}" style="--rpe:${option.color}" data-action="rpe" data-key="${eKey}" data-rpe="${option.id}">
-                ${escapeHtml(option.label)}
-              </button>
-            `).join("")}
-          </div>
+          ${history.length ? `
+            <div class="history-list">
+              ${history.map(item => `
+                <div class="history-row">
+                  <span>
+                    <strong>${item.weight} кг × ${item.reps}</strong>
+                    <span>RPE ${item.rpe} · ориентир ${item.recommendation} кг</span>
+                  </span>
+                  <span class="pill">${formatDateTime(item.date)}</span>
+                </div>
+              `).join("")}
+            </div>
+            <svg class="sparkline" viewBox="0 0 100 28" aria-hidden="true">
+              <polyline points="${points.map((point, idx) => `${idx * (100 / Math.max(1, points.length - 1))},${26 - point * 0.22}`).join(" ")}" />
+            </svg>
+          ` : `<div class="empty-state">После первого подхода выбери RPE, и я начну запоминать рабочий вес.</div>`}
         </div>
       `;
     }
@@ -2807,21 +4636,49 @@
     function renderSetRow(weekIdx, dayIdx, exIdx, setIdx, base, exData) {
       const log = getSetLog(weekIdx, dayIdx, exIdx, setIdx);
       return `
-        <div class="set-row ${log.done ? "done" : ""}">
-          <div class="set-num">${setIdx + 1}</div>
-          <label>
-            <span class="subtle">кг</span>
-            <input type="number" min="0" step="0.5" inputmode="decimal" value="${escapeAttr(log.weight)}" data-action="weight" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" aria-label="Вес, кг">
-          </label>
-          <label>
-            <span class="subtle">${exData.planId === "plank" ? "сек" : "повторы"}</span>
-            <span class="rep-control">
-              <button type="button" data-action="rep-minus" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Минус">${ICONS.minus}</button>
-              <input type="number" min="0" step="1" inputmode="numeric" value="${escapeAttr(log.reps)}" data-action="reps" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" aria-label="Повторы">
-              <button type="button" data-action="rep-plus" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Плюс">${ICONS.plus}</button>
-            </span>
-          </label>
-          <button type="button" class="set-check ${log.done ? "done" : ""}" data-action="set-done" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" data-rest="${base.restSec}" data-label="${escapeAttr(exData.name)}" title="Подход готов">${log.done ? ICONS.check : ICONS.timer}</button>
+        <div class="set-wrap">
+          <div class="set-row ${log.done ? "done" : ""}">
+            <div class="set-num">${setIdx + 1}</div>
+            <label>
+              <span class="subtle">кг</span>
+              <span class="weight-control">
+                <button type="button" data-action="weight-step" data-delta="-${weightStepFor(base.planId)}" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Минус вес">${ICONS.minus}</button>
+                <input type="number" min="0" max="500" step="0.5" inputmode="decimal" autocomplete="off" placeholder="кг" value="${escapeAttr(log.weight)}" data-action="weight" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" aria-label="Вес, кг">
+                <button type="button" data-action="weight-step" data-delta="${weightStepFor(base.planId)}" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Плюс вес">${ICONS.plus}</button>
+              </span>
+            </label>
+            <label>
+              <span class="subtle">${exData.planId === "plank" ? "сек" : "повторы"}</span>
+              <span class="rep-control">
+                <button type="button" data-action="rep-minus" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Минус">${ICONS.minus}</button>
+                <input type="number" min="0" max="500" step="1" inputmode="numeric" autocomplete="off" value="${escapeAttr(log.reps)}" data-action="reps" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" aria-label="Повторы">
+                <button type="button" data-action="rep-plus" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" title="Плюс">${ICONS.plus}</button>
+              </span>
+            </label>
+            <button type="button" class="set-check ${log.done ? "done" : ""}" data-action="set-done" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" data-rest="${base.restSec}" data-label="${escapeAttr(exData.name)}" title="Подход готов">${log.done ? ICONS.check : ICONS.timer}</button>
+          </div>
+          ${log.done ? renderSetRpe(weekIdx, dayIdx, exIdx, setIdx, log) : ""}
+        </div>
+      `;
+    }
+
+    function renderSetRpe(weekIdx, dayIdx, exIdx, setIdx, log) {
+      const selected = log.rpe || "";
+      const store = getExerciseStore(PLAN[weekIdx].days[dayIdx].exercises[exIdx].id);
+      const last = store.history?.slice(-1)[0];
+      return `
+        <div class="set-rpe">
+          <div class="set-rpe-title">
+            <strong>Как тебе этот подход?</strong>
+            <span>${last?.setKey === setKey(weekIdx, dayIdx, exIdx, setIdx) ? `следующий ориентир ${last.recommendation} кг` : "RPE цель 6-7"}</span>
+          </div>
+          <div class="rpe-grid">
+            ${RPE_OPTIONS.map(option => `
+              <button type="button" class="rpe-button ${selected === option.id ? "active" : ""}" style="--rpe:${option.color}" data-action="set-rpe" data-week="${weekIdx}" data-day="${dayIdx}" data-ex="${exIdx}" data-set="${setIdx}" data-rpe="${option.id}">
+                ${escapeHtml(option.label)}
+              </button>
+            `).join("")}
+          </div>
         </div>
       `;
     }
@@ -2857,7 +4714,8 @@
       const progress = workoutProgress();
       const completed = state.completedWorkouts[key];
       const ready = progress.doneSets === progress.totalSets;
-      const feeling = state.workoutFeeling[key] || "";
+      const feelingRecord = state.workoutFeeling[key] || "";
+      const feeling = typeof feelingRecord === "string" ? feelingRecord : feelingRecord.feeling || "";
       return `
         <section class="panel">
           <div class="section-title">
@@ -2880,6 +4738,7 @@
           <button type="button" class="finish-button ${completed ? "complete" : ""}" data-action="finish" ${ready ? "" : "disabled"}>
             ${icon("check")}${completed ? "Тренировка записана" : "Завершить тренировку"}
           </button>
+          ${completed ? `<button type="button" class="finish-button share-button" data-action="share-workout">${icon("download")}Поделиться результатом</button>` : ""}
         </section>
       `;
     }
@@ -2927,6 +4786,10 @@
       `;
     }
 
+    function renderPullIndicator() {
+      return `<div class="pull-indicator" id="pull-indicator">Отпусти, чтобы обновить</div>`;
+    }
+
     function renderQuickStats() {
       const stats = monthStats();
       const progress = workoutProgress();
@@ -2940,7 +4803,7 @@
           <div class="stat-grid">
             <div class="stat-tile"><strong>${stats.workouts}</strong><span>тренировок</span></div>
             <div class="stat-tile"><strong>${game.streak}</strong><span>недель стрика</span></div>
-            <div class="stat-tile"><strong>${game.level}</strong><span>уровень</span></div>
+            <div class="stat-tile"><strong>${game.level}</strong><span>${escapeHtml(game.levelName)}</span></div>
           </div>
           <div class="tiny-bar" style="height:6px;margin-top:12px"><span style="width:${progress.pct}%"></span></div>
           <p class="subtle" style="margin-top:9px">${progress.pct}% текущей тренировки готово</p>
@@ -3033,6 +4896,9 @@
         <div class="layout">
           <section class="stack">
             ${renderProgressHero(progress)}
+            ${renderBodyMapPanel()}
+            ${renderBodyWeightPanel()}
+            ${renderWeeklyRingsPanel(progress.activity)}
             ${renderCalendarPanel()}
             ${renderAchievementsPanel(progress)}
             ${renderRecordsPanel()}
@@ -3056,13 +4922,185 @@
             <div class="workout-meta">
               <span class="pill">${progress.currentWeekCount}/3 на этой неделе</span>
               <span class="pill">${progress.perfectWeeks} идеальных недель</span>
-              <span class="pill">уровень ${progress.level}</span>
+              <span class="pill">уровень ${progress.level} · ${escapeHtml(progress.levelName)}</span>
             </div>
             <div class="level-bar"><span style="width:${Math.round((progress.levelXp / 500) * 100)}%"></span></div>
             <p class="subtle" style="margin-top:8px">${progress.xp} XP · до следующего уровня ${progress.nextLevel} XP</p>
           </div>
           <div class="streak-flame">${ICONS.flame}</div>
         </section>
+      `;
+    }
+
+    function renderWeeklyRingsPanel(activity) {
+      const rings = [
+        { label: "Зал", value: activity.gym, goal: 3, color: "var(--green)" },
+        { label: "Дом", value: activity.home, goal: 2, color: "var(--cyan)" },
+        { label: "Йога", value: activity.yoga, goal: 7, color: "var(--gold)" }
+      ];
+      return `
+        <section class="panel">
+          <div class="section-title">
+            <h2>${icon("activity")}Кольца недели</h2>
+            <small>${weekKey()}</small>
+          </div>
+          <div class="rings-grid">
+            ${rings.map(item => {
+              const pct = Math.min(100, Math.round((item.value / item.goal) * 100));
+              return `
+                <div class="ring-card">
+                  <div class="progress-ring small-ring" style="--accent:${item.color}; --pct:${pct}%"><span>${item.value}/${item.goal}</span></div>
+                  <strong>${escapeHtml(item.label)}</strong>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderBodyMapPanel() {
+      const muscleData = muscleMapForWeek();
+      const legend = ["Ноги", "Грудь", "Спина", "Плечи", "Бицепс", "Трицепс", "Кор"];
+      return `
+        <section class="panel body-map-section">
+          <div class="section-title">
+            <h2>${icon("activity")}Мышцы этой недели</h2>
+            <small>последние 7 дней</small>
+          </div>
+          <div class="body-map-grid">
+            <div class="body-map-view">
+              <span class="subtle">Перед</span>
+              ${renderBodySvg("front", muscleData)}
+            </div>
+            <div class="body-map-view">
+              <span class="subtle">Спина</span>
+              ${renderBodySvg("back", muscleData)}
+            </div>
+          </div>
+          <div class="body-map-legend">
+            ${legend.map(name => {
+              const item = muscleData[name] || { sets: 0, volume: 0 };
+              return `
+                <button type="button" class="legend-item" data-action="body-muscle" data-muscle="${escapeAttr(name)}">
+                  <span class="legend-dot" style="background:${MUSCLE_COLOR[name] || "#888"}"></span>
+                  <span>${escapeHtml(name)} · ${item.sets} сетов</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderBodyWeightPanel() {
+      const entries = [...bodyLog].sort((a, b) => (a.loggedAt || a.date).localeCompare(b.loggedAt || b.date)).slice(-30);
+      const latest = [...entries].reverse().slice(0, 5);
+      return `
+        <section class="panel">
+          <div class="section-title">
+            <h2>${icon("chart")}Вес тела</h2>
+            <small>последние 30 записей</small>
+          </div>
+          <div class="body-weight-input">
+            <input type="number" inputmode="decimal" min="30" max="250" step="0.1" autocomplete="off" placeholder="кг сегодня" id="bodyWeightInput" aria-label="Вес тела сегодня">
+            <button type="button" data-action="log-body-weight">${icon("check")}Записать</button>
+          </div>
+          ${renderWeightChart(entries)}
+          <div class="body-log-list">
+            ${latest.length ? latest.map((entry, idx) => {
+              const prev = entries[entries.length - 2 - idx];
+              const delta = prev ? Math.round((entry.weight - prev.weight) * 10) / 10 : 0;
+              const sign = delta > 0 ? "▲+" : delta < 0 ? "▼" : "• ";
+              return `
+                <div class="history-row">
+                  <span>
+                    <strong>${entry.weight} кг</strong>
+                    <span>${escapeHtml(entry.date || (entry.loggedAt || "").slice(0, 10))}</span>
+                  </span>
+                  <span class="pill">${prev ? `${sign}${delta}` : "старт"}</span>
+                </div>
+              `;
+            }).join("") : `<div class="empty-state">Запиши вес тела, и здесь появится график.</div>`}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderWeightChart(entries) {
+      if (entries.length < 2) return `<p class="subtle" style="margin:12px 0">Нужно минимум 2 записи для графика.</p>`;
+      const W = 300;
+      const H = 80;
+      const PAD = 16;
+      const weights = entries.map(entry => Number(entry.weight)).filter(Number.isFinite);
+      const min = Math.min(...weights) - 1;
+      const max = Math.max(...weights) + 1;
+      const points = entries.map((entry, idx) => {
+        const x = PAD + (idx / Math.max(1, entries.length - 1)) * (W - PAD * 2);
+        const y = H - PAD - ((entry.weight - min) / Math.max(1, max - min)) * (H - PAD * 2);
+        return `${Math.round(x * 10) / 10},${Math.round(y * 10) / 10}`;
+      });
+      const dots = points.map(point => {
+        const [x, y] = point.split(",");
+        return `<circle cx="${x}" cy="${y}" r="3" fill="var(--green)"/>`;
+      }).join("");
+      const [lastX, lastY] = points[points.length - 1].split(",");
+      return `
+        <svg viewBox="0 0 ${W} ${H}" class="weight-chart-svg" aria-label="График веса тела">
+          <polyline points="${points.join(" ")}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          ${dots}
+          <circle cx="${lastX}" cy="${lastY}" r="5" fill="var(--green)" stroke="var(--surface)" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function bodyZoneStyle(zoneId, muscleData) {
+      const muscle = Object.entries(MUSCLE_SVG_MAP).find(([, zones]) => zones.includes(zoneId))?.[0] || "";
+      const data = muscleData[muscle] || { sets: 0, volume: 0 };
+      const color = data.sets ? (MUSCLE_COLOR[muscle] || "#888") : "#1e2028";
+      const opacity = data.sets === 0 ? 1 : data.sets <= 2 ? 0.3 : data.sets <= 5 ? 0.6 : 1;
+      const glow = data.sets >= 6 ? `filter:drop-shadow(0 0 6px ${color});` : "";
+      return `fill:${color};opacity:${opacity};${glow}`;
+    }
+
+    function bodyZoneAttrs(zoneId, muscleData) {
+      const muscle = Object.entries(MUSCLE_SVG_MAP).find(([, zones]) => zones.includes(zoneId))?.[0] || "";
+      return `style="${bodyZoneStyle(zoneId, muscleData)}" data-action="body-muscle" data-muscle="${escapeAttr(muscle)}"`;
+    }
+
+    function renderBodySvg(view, muscleData) {
+      if (view === "front") {
+        return `
+          <svg viewBox="0 0 120 280" class="body-svg" role="img" aria-label="Карта мышц спереди">
+            <ellipse cx="60" cy="22" rx="18" ry="20" fill="#1e2028"/>
+            <rect x="53" y="40" width="14" height="12" rx="4" fill="#1e2028"/>
+            <ellipse id="front-shoulders" cx="60" cy="62" rx="42" ry="14" ${bodyZoneAttrs("front-shoulders", muscleData)}/>
+            <ellipse id="front-chest" cx="60" cy="82" rx="30" ry="18" ${bodyZoneAttrs("front-chest", muscleData)}/>
+            <ellipse id="front-biceps" cx="22" cy="96" rx="10" ry="22" ${bodyZoneAttrs("front-biceps", muscleData)}/>
+            <ellipse cx="98" cy="96" rx="10" ry="22" ${bodyZoneAttrs("front-biceps", muscleData)}/>
+            <rect id="front-abs" x="45" y="100" width="30" height="42" rx="8" ${bodyZoneAttrs("front-abs", muscleData)}/>
+            <ellipse id="front-quads" cx="44" cy="168" rx="18" ry="32" ${bodyZoneAttrs("front-quads", muscleData)}/>
+            <ellipse cx="76" cy="168" rx="18" ry="32" ${bodyZoneAttrs("front-quads", muscleData)}/>
+            <ellipse id="front-calves" cx="44" cy="234" rx="11" ry="22" ${bodyZoneAttrs("front-calves", muscleData)}/>
+            <ellipse cx="76" cy="234" rx="11" ry="22" ${bodyZoneAttrs("front-calves", muscleData)}/>
+          </svg>
+        `;
+      }
+      return `
+        <svg viewBox="0 0 120 280" class="body-svg" role="img" aria-label="Карта мышц со спины">
+          <ellipse cx="60" cy="22" rx="18" ry="20" fill="#1e2028"/>
+          <ellipse id="back-traps" cx="60" cy="58" rx="34" ry="12" ${bodyZoneAttrs("back-traps", muscleData)}/>
+          <ellipse id="back-shoulders" cx="60" cy="62" rx="42" ry="12" ${bodyZoneAttrs("back-shoulders", muscleData)}/>
+          <path id="back-lats" d="M30,70 Q18,100 28,130 L52,130 L52,70 Z M90,70 Q102,100 92,130 L68,130 L68,70 Z" ${bodyZoneAttrs("back-lats", muscleData)}/>
+          <rect id="back-rhomboids" x="44" y="72" width="32" height="36" rx="6" ${bodyZoneAttrs("back-rhomboids", muscleData)}/>
+          <ellipse id="back-triceps" cx="22" cy="96" rx="10" ry="22" ${bodyZoneAttrs("back-triceps", muscleData)}/>
+          <ellipse cx="98" cy="96" rx="10" ry="22" ${bodyZoneAttrs("back-triceps", muscleData)}/>
+          <ellipse id="back-glutes" cx="60" cy="148" rx="30" ry="20" ${bodyZoneAttrs("back-glutes", muscleData)}/>
+          <ellipse id="back-hamstrings" cx="44" cy="185" rx="18" ry="30" ${bodyZoneAttrs("back-hamstrings", muscleData)}/>
+          <ellipse cx="76" cy="185" rx="18" ry="30" ${bodyZoneAttrs("back-hamstrings", muscleData)}/>
+          <ellipse id="back-calves" cx="44" cy="238" rx="11" ry="22" ${bodyZoneAttrs("back-calves", muscleData)}/>
+          <ellipse cx="76" cy="238" rx="11" ry="22" ${bodyZoneAttrs("back-calves", muscleData)}/>
+        </svg>
       `;
     }
 
@@ -3078,14 +5116,49 @@
           <div class="calendar-grid">
             ${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map(label => `<div class="calendar-label">${label}</div>`).join("")}
             ${days.map(day => `
-              <div class="calendar-day ${day.status} ${day.isToday ? "today" : ""}" title="${day.key}">
+              <div class="calendar-day ${day.status} ${day.isToday ? "today" : ""}" title="${day.key}" data-action="calendar-day" data-date="${day.key}">
                 <span style="${day.inMonth ? "" : "opacity:.25"}">${day.date.getDate()}</span>
+                <em>${calendarDayIcon(day.key)}</em>
                 ${day.status === "missed" && freezes < 2 ? `<button type="button" data-action="freeze-day" data-date="${day.key}">щит</button>` : ""}
               </div>
             `).join("")}
           </div>
-          <p class="subtle" style="margin-top:10px">Зеленый - тренировка закрыта, красный - пропуск по плану, голубой - использована заморозка.</p>
+          ${ui.calendarDetail ? renderCalendarDetail(ui.calendarDetail) : ""}
+          <div class="calendar-legend">
+            <span>🏋️ зал</span><span>🏠 дом</span><span>🧘 йога</span><span>🛡 freeze</span>
+          </div>
         </section>
+      `;
+    }
+
+    function calendarDayIcon(key) {
+      const items = calendarDetailsForDate(key);
+      if (items.some(item => item.type === "gym")) return "🏋️";
+      if (items.some(item => item.type === "home")) return "🏠";
+      if (items.some(item => item.type === "yoga")) return "🧘";
+      if (state.freezes[key]) return "🛡";
+      return "";
+    }
+
+    function calendarDetailsForDate(key) {
+      const gym = completedWorkoutEntries()
+        .filter(item => (item.completedAt || "").startsWith(key))
+        .map(item => ({ type: "gym", title: item.title || "Зал", detail: item.focus || "", xp: item.xp || XP_TABLE.gymWorkout }));
+      const extra = workoutLog
+        .filter(item => (item.completedAt || item.date || "").startsWith(key) && ["home", "yoga"].includes(item.type))
+        .map(item => ({ type: item.type, title: item.title || item.type, detail: item.type === "home" ? "Домашняя тренировка" : "Йога", xp: item.xp || (item.type === "home" ? XP_TABLE.homeWorkout : XP_TABLE.yoga) }));
+      return [...gym, ...extra];
+    }
+
+    function renderCalendarDetail(key) {
+      const items = calendarDetailsForDate(key);
+      return `
+        <div class="calendar-detail">
+          <strong>${escapeHtml(key)}</strong>
+          ${items.length ? items.map(item => `
+            <span>${item.type === "gym" ? "🏋️" : item.type === "home" ? "🏠" : "🧘"} ${escapeHtml(item.title)} · +${item.xp} XP</span>
+          `).join("") : `<span>Нет записанной тренировки.</span>`}
+        </div>
       `;
     }
 
@@ -3100,7 +5173,7 @@
           <div class="reward-grid">
             ${ACHIEVEMENTS.map(item => `
               <article class="reward-card ${unlocked.has(item.id) ? "unlocked" : ""}">
-                <div class="badge-icon">${ICONS[item.icon]}</div>
+                <div class="badge-icon">${ICONS[item.icon] || escapeHtml(item.icon)}</div>
                 <strong>${escapeHtml(item.title)}</strong>
                 <span>${escapeHtml(item.desc)}</span>
               </article>
@@ -3194,6 +5267,7 @@
           <div class="compact-actions">
             <button type="button" data-action="export-json">${icon("download")}JSON</button>
             <button type="button" data-action="export-csv">${icon("download")}CSV</button>
+            <button type="button" data-action="share-week">${icon("sparkles")}Неделя PNG</button>
           </div>
           <p class="subtle" style="margin-top:9px">JSON хранит весь прогресс. CSV удобен для таблиц и анализа весов.</p>
         </section>
@@ -3207,6 +5281,33 @@
           ${Array.from({ length: 34 }, (_, idx) => `
             <span class="confetti-piece" style="left:${3 + Math.random() * 94}%;background:${colors[idx % colors.length]};animation-delay:${Math.random() * 220}ms"></span>
           `).join("")}
+        </div>
+      `;
+    }
+
+    function renderRecoveryOverlay() {
+      if (!ui.pendingRecovery) return "";
+      return `
+        <div class="recovery-overlay">
+          <section class="panel recovery-card">
+            <div class="section-title">
+              <h2>Как ты сейчас?</h2>
+              <small>${escapeHtml(ui.pendingRecovery.title || "после тренировки")}</small>
+            </div>
+            <div class="recovery-options">
+              ${[
+                ["tired", "😴", "Устал сильно", 1],
+                ["normal", "😐", "Нормально", 3],
+                ["good", "😊", "Бодро", 4],
+                ["great", "⚡", "Летаю", 5]
+              ].map(([id, emoji, label, energy]) => `
+                <button type="button" data-action="recovery-answer" data-feeling="${id}" data-energy="${energy}">
+                  <strong>${emoji}</strong>
+                  <span>${escapeHtml(label)}</span>
+                </button>
+              `).join("")}
+            </div>
+          </section>
         </div>
       `;
     }
@@ -3277,7 +5378,7 @@
         const action = el.dataset.action;
         if (action === "weight" || action === "reps") {
           el.addEventListener("change", handleInput);
-          el.addEventListener("input", handleInput);
+          el.addEventListener("blur", handleInput);
         } else {
           el.addEventListener("click", handleAction);
         }
@@ -3290,9 +5391,11 @@
       const dayIdx = Number(target.dataset.day);
       const exIdx = Number(target.dataset.ex);
       const setIdx = Number(target.dataset.set);
-      mutate(draft => {
-        setLog(weekIdx, dayIdx, exIdx, setIdx, { [target.dataset.action === "weight" ? "weight" : "reps"]: target.value });
-      });
+      const field = target.dataset.action === "weight" ? "weight" : "reps";
+      const current = getSetLog(weekIdx, dayIdx, exIdx, setIdx);
+      if (String(current[field] ?? "") === String(target.value ?? "")) return;
+      setLog(weekIdx, dayIdx, exIdx, setIdx, { [field]: target.value });
+      saveState();
     }
 
     function handleAction(event) {
@@ -3303,12 +5406,60 @@
         render();
         return;
       }
+      if (action === "mode") {
+        ui.trainingMode = target.dataset.mode;
+        ui.expanded = null;
+        render();
+        return;
+      }
+      if (action === "today-open") {
+        const mode = target.dataset.mode;
+        if (mode === "nutrition") {
+          ui.activeTab = "nutrition";
+        } else {
+          ui.activeTab = "training";
+          ui.trainingMode = mode === "rest" ? "yoga" : mode;
+          if (mode === "gym" && todayPlan().dayIdx !== undefined) state.dayIdx = todayPlan().dayIdx;
+        }
+        saveState();
+        render();
+        return;
+      }
+      if (action === "profile-experience") {
+        syncProfileDraftFromDom();
+        profileDraft().experience = target.dataset.value;
+        render();
+        return;
+      }
+      if (action === "profile-day") {
+        syncProfileDraftFromDom();
+        const draft = profileDraft();
+        const day = Number(target.dataset.day);
+        draft.gymDays = draft.gymDays.includes(day) ? draft.gymDays.filter(item => item !== day) : [...draft.gymDays, day].sort();
+        render();
+        return;
+      }
+      if (action === "save-profile") {
+        syncProfileDraftFromDom();
+        userProfile = {
+          ...profileDraft(),
+          createdAt: new Date().toISOString(),
+          gymDays: profileDraft().gymDays.length ? profileDraft().gymDays : [1, 3, 5]
+        };
+        saveState(true);
+        haptic([20, 35, 20]);
+        showToast("Профиль готов", "План сохранен локально на этом устройстве.");
+        render();
+        return;
+      }
       if (action === "week") {
+        const nextWeekIdx = Number(target.dataset.week);
         mutate(draft => {
-          draft.weekIdx = Number(target.dataset.week);
+          draft.weekIdx = nextWeekIdx;
           draft.dayIdx = 0;
           ui.expanded = null;
         });
+        phaseToast(nextWeekIdx);
         return;
       }
       if (action === "day") {
@@ -3333,6 +5484,36 @@
         render();
         return;
       }
+      if (action === "recovery-answer") {
+        const payload = {
+          type: ui.pendingRecovery?.type || "workout",
+          key: ui.pendingRecovery?.key || TODAY_KEY,
+          title: ui.pendingRecovery?.title || "Тренировка",
+          feeling: target.dataset.feeling,
+          energy: Number(target.dataset.energy) || 3,
+          loggedAt: new Date().toISOString()
+        };
+        recoveryLog.push(payload);
+        state.workoutFeeling[payload.key] = { feeling: payload.feeling, energy: payload.energy, loggedAt: payload.loggedAt };
+        ui.pendingRecovery = null;
+        saveState(true);
+        showToast("Самочувствие записано", `Восстановление сейчас ${recoveryScore().value}%.`);
+        haptic([16, 28, 16]);
+        render();
+        setTimeout(() => showToast("Следующая тренировка", nextWorkoutPrompt()), 650);
+        return;
+      }
+      if (action === "body-muscle") {
+        const muscle = target.dataset.muscle || "Мышца";
+        const data = muscleMapForWeek()[muscle] || { sets: 0, volume: 0 };
+        showToast(muscle, `${data.sets} подходов за 7 дней · объем ${Math.round(data.volume || 0)} кг`);
+        return;
+      }
+      if (action === "calendar-day") {
+        ui.calendarDetail = ui.calendarDetail === target.dataset.date ? null : target.dataset.date;
+        render();
+        return;
+      }
       if (action === "warmup-check" || action === "stretch-check") {
         const bucket = action === "warmup-check" ? "warmupDone" : "stretchDone";
         mutate(draft => {
@@ -3341,11 +5522,71 @@
         haptic();
         return;
       }
-      if (action === "rpe") {
+      if (action === "home-check") {
         mutate(draft => {
-          draft.ratings[target.dataset.key] = target.dataset.rpe;
+          draft.homeDone[target.dataset.key] = !draft.homeDone[target.dataset.key];
         });
         haptic(12);
+        return;
+      }
+      if (action === "home-timer") {
+        startTimer(40, "Домашний подход");
+        return;
+      }
+      if (action === "home-finish") {
+        const workout = currentHomeWorkout();
+        const progress = homeProgress(workout);
+        if (!progress.complete) return;
+        const already = workoutLog.some(item => item.type === "home" && item.dateKey === TODAY_KEY && item.workoutId === workout.id);
+        if (!already) {
+          workoutLog.push({ type: "home", workoutId: workout.id, dateKey: TODAY_KEY, completedAt: new Date().toISOString(), title: workout.name, xp: 90 });
+        }
+        saveState(true);
+        showToast("Дом записан", "+90 XP за домашнюю тренировку.");
+        haptic([18, 32, 18]);
+        queueRecoveryPrompt("home", `${TODAY_KEY}-${workout.id}`, workout.name);
+        render();
+        return;
+      }
+      if (action === "yoga-start-pose") {
+        startTimer(Number(target.dataset.seconds), target.dataset.label || "Йога");
+        return;
+      }
+      if (action === "yoga-next") {
+        mutate(draft => {
+          const program = todayYogaProgram();
+          const yState = yogaDayState(program);
+          if (yState.done) {
+            yState.poseIdx = 0;
+            yState.done = false;
+          } else {
+            yState.poseIdx = Math.min(program.poses.length, yState.poseIdx + 1);
+            yState.done = yState.poseIdx >= program.poses.length;
+          }
+        });
+        return;
+      }
+      if (action === "yoga-jump") {
+        mutate(draft => {
+          const program = todayYogaProgram();
+          const yState = yogaDayState(program);
+          yState.poseIdx = Math.min(program.poses.length, Number(target.dataset.pose) + 1);
+          yState.done = yState.poseIdx >= program.poses.length;
+        });
+        return;
+      }
+      if (action === "yoga-finish") {
+        mutate(draft => {
+          const program = todayYogaProgram();
+          const yState = yogaDayState(program);
+          yState.poseIdx = program.poses.length;
+          yState.done = true;
+          if (!workoutLog.some(item => item.type === "yoga" && item.dateKey === TODAY_KEY)) {
+            workoutLog.push({ type: "yoga", dateKey: TODAY_KEY, completedAt: new Date().toISOString(), title: program.name, xp: 35 });
+          }
+        });
+        showToast("Йога записана", "+35 XP и плюс к восстановлению.");
+        queueRecoveryPrompt("yoga", `${TODAY_KEY}-yoga`, todayYogaProgram().name);
         return;
       }
       if (action === "feeling") {
@@ -3403,14 +5644,57 @@
         const rest = Number(target.dataset.rest);
         const label = target.dataset.label || "Отдых";
         const current = getSetLog(weekIdx, dayIdx, exIdx, setIdx);
+        const planItem = PLAN[weekIdx].days[dayIdx].exercises[exIdx];
+        const row = target.closest(".set-row");
+        const weightInput = row?.querySelector('[data-action="weight"]');
+        const repsInput = row?.querySelector('[data-action="reps"]');
+        const rawWeight = weightInput ? weightInput.value : current.weight;
+        const rawReps = repsInput ? repsInput.value : current.reps;
+        if (!current.done && isWeightedExercise(planItem.id) && String(rawWeight).trim() === "") {
+          const card = target.closest(".exercise");
+          card?.classList.remove("shake");
+          void card?.offsetWidth;
+          card?.classList.add("shake");
+          showToast("Сначала вес", "Можно поставить 0 кг, но поле не должно быть пустым.");
+          haptic([80, 40, 80]);
+          return;
+        }
         mutate(draft => {
           setLog(weekIdx, dayIdx, exIdx, setIdx, {
+            weight: rawWeight,
+            reps: rawReps,
             done: !current.done,
             doneAt: current.done ? "" : new Date().toISOString()
           });
         });
         haptic(current.done ? 10 : [16, 35, 16]);
         if (!current.done) startTimer(rest, label);
+        return;
+      }
+      if (action === "set-rpe") {
+        const weekIdx = Number(target.dataset.week);
+        const dayIdx = Number(target.dataset.day);
+        const exIdx = Number(target.dataset.ex);
+        const setIdx = Number(target.dataset.set);
+        let result;
+        mutate(draft => {
+          result = saveSetRpe(weekIdx, dayIdx, exIdx, setIdx, target.dataset.rpe);
+        });
+        haptic([18, 28, 18]);
+        if (result) showToast("RPE сохранен", `${result.option.tip} Ориентир: ${result.recommendation} кг.`);
+        return;
+      }
+      if (action === "weight-step") {
+        const weekIdx = Number(target.dataset.week);
+        const dayIdx = Number(target.dataset.day);
+        const exIdx = Number(target.dataset.ex);
+        const setIdx = Number(target.dataset.set);
+        const delta = Number(target.dataset.delta);
+        const current = getSetLog(weekIdx, dayIdx, exIdx, setIdx);
+        const next = Math.max(0, Math.round(((numberValue(current.weight) ?? 0) + delta) * 10) / 10);
+        mutate(draft => {
+          setLog(weekIdx, dayIdx, exIdx, setIdx, { weight: next });
+        });
         return;
       }
       if (action === "rep-minus" || action === "rep-plus") {
@@ -3462,6 +5746,7 @@
         return;
       }
       if (action === "freeze-day") {
+        event.stopPropagation();
         const key = target.dataset.date;
         if (freezeUsesThisMonth() >= 2) {
           showToast("Лимит freeze", "В этом месяце уже использованы 2 заморозки.");
@@ -3473,12 +5758,35 @@
         showToast("Стрик защищен", "Этот пропуск не будет считаться красным днем.");
         return;
       }
+      if (action === "log-body-weight") {
+        const input = document.getElementById("bodyWeightInput");
+        const val = Number(String(input?.value || "").replace(",", "."));
+        if (!Number.isFinite(val) || val < 20 || val > 300) {
+          showToast("Неверный вес", "Введи вес в кг, например 70.5");
+          return;
+        }
+        bodyLog.push({ date: TODAY_KEY, weight: Math.round(val * 10) / 10, loggedAt: new Date().toISOString() });
+        workoutLog.push({ type: "bodyWeight", dateKey: TODAY_KEY, completedAt: new Date().toISOString(), title: "Вес тела", xp: XP_TABLE.bodyWeightLog });
+        if (input) input.value = "";
+        saveState(true);
+        showToast("Вес записан", `${Math.round(val * 10) / 10} кг · +${XP_TABLE.bodyWeightLog} XP.`);
+        render();
+        return;
+      }
       if (action === "export-json") {
         exportJson();
         return;
       }
       if (action === "export-csv") {
         exportCsv();
+        return;
+      }
+      if (action === "share-workout") {
+        generateShareCard(currentWorkoutShareData());
+        return;
+      }
+      if (action === "share-week") {
+        generateShareCard(weeklyShareData());
         return;
       }
       if (action === "finish") {
@@ -3500,10 +5808,22 @@
             feeling: draft.workoutFeeling[key] || "",
             xp: 120 + progress.doneSets * 8
           };
+          workoutLog.push({
+            type: "gym",
+            dateKey: TODAY_KEY,
+            completedAt: draft.completedWorkouts[key].completedAt,
+            workoutKey: key,
+            title: `Неделя ${week.week}, тренировка ${day.type}`,
+            focus: day.focus,
+            xp: 120 + progress.doneSets * 8
+          });
         });
         haptic([25, 40, 25]);
-        showToast("Тренировка сохранена", `+${120 + progress.doneSets * 8} XP · стрик и PR обновлены.`);
+        const cycleClosed = celebrateCycleIfReady();
+        if (!cycleClosed) showToast("Тренировка сохранена", `+${120 + progress.doneSets * 8} XP · стрик и PR обновлены.`);
+        queueRecoveryPrompt("gym", key, `Неделя ${currentWeek().week}, тренировка ${currentWorkout().type}`);
         setTimeout(() => {
+          if (cycleClosed) return;
           ui.celebrating = false;
           render();
         }, 1200);
@@ -3513,10 +5833,17 @@
     function exportJson() {
       const payload = {
         exportedAt: new Date().toISOString(),
-        app: "gym-assistant-pro",
-        state
+        app: "gymper",
+        state,
+        userProfile,
+        exerciseData,
+        workoutLog,
+        streak: streakStore,
+        bodyLog,
+        recoveryLog,
+        remindersShown
       };
-      downloadFile(`gym-progress-${TODAY_KEY}.json`, JSON.stringify(payload, null, 2), "application/json");
+      downloadFile(`gymper-progress-${TODAY_KEY}.json`, JSON.stringify(payload, null, 2), "application/json");
       showToast("JSON готов", "Полный бэкап прогресса скачан.");
     }
 
@@ -3537,13 +5864,126 @@
           log.done ? "yes" : "no"
         ]);
       });
+      workoutLog.filter(item => item.type === "home" || item.type === "yoga").forEach(item => {
+        rows.push([
+          item.completedAt || item.date || "",
+          "",
+          item.type,
+          item.title || item.workoutId || item.type,
+          "",
+          "",
+          "",
+          "",
+          "yes"
+        ]);
+      });
       const csv = rows.map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
-      downloadFile(`gym-progress-${TODAY_KEY}.csv`, csv, "text/csv");
+      downloadFile(`gymper-progress-${TODAY_KEY}.csv`, csv, "text/csv");
       showToast("CSV готов", "Таблица подходов скачана.");
+    }
+
+    function currentWorkoutShareData() {
+      const progress = workoutProgress();
+      let volume = 0;
+      currentWorkout().exercises.forEach((_, exIdx) => {
+        const base = prescribedExercise(state.weekIdx, state.dayIdx, exIdx);
+        for (let setIdx = 0; setIdx < base.sets; setIdx++) {
+          const log = getSetLog(state.weekIdx, state.dayIdx, exIdx, setIdx);
+          if (!log.done) continue;
+          const weight = numberValue(log.weight) || 0;
+          const reps = numberValue(log.reps) || 0;
+          volume += weight * reps;
+        }
+      });
+      return {
+        title: `${currentWeek().phaseLabel || phaseMeta().label} · ${currentWorkout().schedule}`,
+        doneSets: progress.doneSets,
+        totalExercises: progress.totalExercises,
+        volume: Math.round(volume),
+        xp: XP_TABLE.gymWorkout + progress.doneSets * XP_TABLE.set
+      };
+    }
+
+    function weeklyShareData() {
+      const activity = activityStatsThisWeek();
+      const sets = muscleMapForWeek();
+      const doneSets = Object.values(sets).reduce((sum, item) => sum + item.sets, 0);
+      const volume = Object.values(sets).reduce((sum, item) => sum + item.volume, 0);
+      const progress = progressStats();
+      return {
+        title: "Неделя в Gymper",
+        doneSets,
+        totalExercises: activity.gym + activity.home + activity.yoga,
+        volume: Math.round(volume),
+        xp: progress.xp
+      };
+    }
+
+    function generateShareCard(workoutData) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1080;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        showToast("Canvas недоступен", "Не получилось создать карточку.");
+        return;
+      }
+      ctx.fillStyle = "#101114";
+      ctx.fillRect(0, 0, 1080, 1080);
+      const grad = ctx.createLinearGradient(0, 0, 0, 420);
+      grad.addColorStop(0, "rgba(47,199,121,0.18)");
+      grad.addColorStop(1, "rgba(47,199,121,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 420);
+      ctx.fillStyle = "#2fc779";
+      ctx.font = "bold 64px system-ui, -apple-system, sans-serif";
+      ctx.fillText("Gymper", 80, 120);
+      ctx.fillStyle = "#a5a1a0";
+      ctx.font = "36px system-ui, -apple-system, sans-serif";
+      ctx.fillText(new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long" }), 80, 175);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 180px system-ui, -apple-system, sans-serif";
+      ctx.fillText(String(workoutData.doneSets || 0), 80, 400);
+      ctx.fillStyle = "#a5a1a0";
+      ctx.font = "48px system-ui, -apple-system, sans-serif";
+      ctx.fillText("подходов выполнено", 80, 460);
+      const stats = [["Упражнений", workoutData.totalExercises || 0], ["Объем", `${workoutData.volume || 0} кг`], ["XP", `+${workoutData.xp || 0}`]];
+      stats.forEach(([label, value], idx) => {
+        const x = 80 + idx * 330;
+        ctx.fillStyle = "#2fc779";
+        ctx.font = "bold 60px system-ui, -apple-system, sans-serif";
+        ctx.fillText(String(value), x, 620);
+        ctx.fillStyle = "#6e6a6b";
+        ctx.font = "30px system-ui, -apple-system, sans-serif";
+        ctx.fillText(label, x, 665);
+      });
+      const phrases = ["Каждый подход — шаг вперед.", "Дисциплина важнее мотивации.", "Ты сделал это. Снова.", "Прогресс не бывает случайным."];
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "italic 40px system-ui, -apple-system, sans-serif";
+      ctx.fillText(phrases[Math.floor(Math.random() * phrases.length)], 80, 820);
+      ctx.fillStyle = "#a5a1a0";
+      ctx.font = "32px system-ui, -apple-system, sans-serif";
+      ctx.fillText(workoutData.title || "Тренировка", 80, 900);
+      canvas.toBlob(blob => {
+        if (!blob) {
+          showToast("Ошибка PNG", "Не получилось собрать карточку.");
+          return;
+        }
+        const file = new File([blob], `gymper-${TODAY_KEY}.png`, { type: "image/png" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ title: "Тренировка в Gymper", files: [file] }).catch(() => downloadBlob(file.name, blob, "image/png"));
+        } else {
+          downloadBlob(file.name, blob, "image/png");
+        }
+      }, "image/png");
     }
 
     function downloadFile(name, content, type) {
       const blob = new Blob([content], { type });
+      downloadBlob(name, blob, type);
+    }
+
+    function downloadBlob(name, blob, type) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -3561,6 +6001,45 @@
       clearTimeout(ui.toastTimer);
       ui.toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
     }
+
+    window.addEventListener("pagehide", () => saveState(true));
+    document.addEventListener("touchstart", event => {
+      if (event.target.closest("input, textarea, button, a")) return;
+      const touch = event.changedTouches[0];
+      touchStart = { x: touch.clientX, y: touch.clientY };
+      ui.pullStartY = window.scrollY <= 0 ? touch.clientY : null;
+      ui.pullDistance = 0;
+    }, { passive: true });
+    document.addEventListener("touchmove", event => {
+      if (ui.pullStartY === null || ui.pullStartY === undefined) return;
+      const touch = event.changedTouches[0];
+      ui.pullDistance = Math.max(0, touch.clientY - ui.pullStartY);
+      const indicator = document.getElementById("pull-indicator");
+      if (indicator) {
+        indicator.classList.toggle("visible", ui.pullDistance > 58);
+        indicator.textContent = ui.pullDistance > 118 ? "Отпусти, чтобы обновить" : "Потяни для обновления";
+      }
+    }, { passive: true });
+    document.addEventListener("touchend", event => {
+      if (!touchStart) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStart.x;
+      const dy = touch.clientY - touchStart.y;
+      touchStart = null;
+      const shouldRefresh = ui.pullDistance > 118;
+      ui.pullStartY = null;
+      ui.pullDistance = 0;
+      document.getElementById("pull-indicator")?.classList.remove("visible");
+      if (shouldRefresh) {
+        location.reload();
+        return;
+      }
+      if (Math.abs(dx) > 64 && Math.abs(dx) > Math.abs(dy) * 1.4) moveTab(dx < 0 ? 1 : -1);
+    }, { passive: true });
+    document.addEventListener("contextmenu", event => event.preventDefault());
+    document.addEventListener("selectstart", event => {
+      if (!event.target.closest("input, textarea")) event.preventDefault();
+    });
 
     clampIndexes();
     render();
