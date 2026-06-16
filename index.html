@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Gymper</title>
-  <meta name="theme-color" content="#101114" />
+  <meta name="theme-color" content="#07080a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Gymper" />
@@ -13,10 +13,17 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #101114;
-      --surface: #171920;
-      --surface-2: #20232b;
-      --surface-3: #272b33;
+      --bg: #07080a;
+      --surface: #14171d;
+      --surface-2: #1d2129;
+      --surface-3: #262b35;
+      --ivory: #f8f3e8;
+      --ivory-2: #fffaf0;
+      --ivory-3: #eee6d7;
+      --ink: #171819;
+      --ink-muted: #5f5a52;
+      --ink-dim: #8a8378;
+      --card-line: rgba(23, 24, 25, 0.1);
       --line: rgba(255, 255, 255, 0.09);
       --line-strong: rgba(255, 255, 255, 0.16);
       --text: #f2f0eb;
@@ -32,7 +39,11 @@
       --gold: #ffd166;
       --radius: 8px;
       --shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
-      --ease-spring: cubic-bezier(0.2, 0.9, 0.22, 1.18);
+      --soft-shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+      --card-shadow: 0 10px 30px rgba(11, 12, 14, 0.1);
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-spring: cubic-bezier(0.2, 0.9, 0.22, 1.08);
     }
 
     * {
@@ -50,7 +61,8 @@
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 280px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 250px),
+        linear-gradient(135deg, rgba(47, 199, 121, 0.08), transparent 42%),
         var(--bg);
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -75,19 +87,22 @@
       background: var(--surface-2);
       color: var(--text);
       cursor: pointer;
-      transition: transform 180ms var(--ease-spring), border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+      line-height: 1.18;
+      transition: transform 150ms var(--ease-out), border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
       text-decoration: none;
-    }
-
-    button:hover,
-    a.button:hover {
-      border-color: var(--line-strong);
-      background: var(--surface-3);
     }
 
     button:active,
     a.button:active {
-      transform: translateY(1px);
+      transform: scale(0.97);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      button:hover,
+      a.button:hover {
+        border-color: var(--line-strong);
+        background: var(--surface-3);
+      }
     }
 
     button:disabled {
@@ -117,7 +132,7 @@
       width: min(1180px, calc(100% - 28px));
       margin: 0 auto;
       padding: calc(22px + env(safe-area-inset-top)) 0 calc(120px + env(safe-area-inset-bottom));
-      animation: appEnter 420ms ease both;
+      animation: appEnter 240ms var(--ease-out) both;
     }
 
     .app-shell.motion-settled {
@@ -301,6 +316,11 @@
     }
 
     .today-card {
+      --surface: var(--ivory);
+      --surface-2: var(--ivory-2);
+      --text: var(--ink);
+      --muted: var(--ink-muted);
+      --line: var(--card-line);
       width: 100%;
       min-height: 126px;
       display: grid;
@@ -311,8 +331,14 @@
       text-align: left;
       border-color: color-mix(in srgb, var(--accent), transparent 62%);
       background:
-        linear-gradient(135deg, color-mix(in srgb, var(--accent), transparent 88%), transparent 62%),
+        linear-gradient(135deg, color-mix(in srgb, var(--accent), transparent 86%), transparent 62%),
         var(--surface);
+      color: var(--text);
+      box-shadow: var(--card-shadow);
+    }
+
+    .today-card .muscle-dot {
+      --muscle: var(--accent);
     }
 
     .today-card strong,
@@ -336,13 +362,47 @@
 
     .today-card em {
       margin-top: 8px;
-      color: color-mix(in srgb, var(--accent), white 14%);
+      color: color-mix(in srgb, var(--accent), black 16%);
       font-size: 12px;
       font-style: normal;
       font-weight: 800;
     }
 
+    .today-command-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .today-command-chip {
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid rgba(23, 24, 25, 0.08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.36);
+    }
+
+    .today-command-chip strong {
+      display: block;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .today-command-chip span {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink-muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
     .recovery-bar {
+      --text: var(--ink);
+      --muted: var(--ink-muted);
+      --line: var(--card-line);
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       gap: 9px;
@@ -350,9 +410,10 @@
       padding: 11px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.035);
+      background: var(--ivory);
       color: var(--muted);
       font-size: 12px;
+      box-shadow: var(--card-shadow);
     }
 
     .recovery-bar.warning {
@@ -363,7 +424,7 @@
     .recovery-track {
       height: 8px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(23, 24, 25, 0.09);
       overflow: hidden;
     }
 
@@ -481,14 +542,51 @@
     .exercise,
     .set-row,
     .history-row {
+      --surface: var(--ivory);
+      --surface-2: var(--ivory-2);
+      --surface-3: var(--ivory-3);
+      --line: var(--card-line);
+      --line-strong: rgba(23, 24, 25, 0.18);
+      --text: var(--ink);
+      --muted: var(--ink-muted);
+      --dim: var(--ink-dim);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--card-shadow);
     }
 
     .panel {
       padding: 14px;
-      animation: riseIn 360ms ease both;
+      animation: riseIn 240ms var(--ease-out) both;
+    }
+
+    .panel button:not(.finish-button),
+    .panel a.button,
+    .exercise button:not(.exercise-main):not(.set-check),
+    .set-row button:not(.set-check) {
+      background: rgba(23, 24, 25, 0.045);
+      color: var(--ink);
+      border-color: rgba(23, 24, 25, 0.1);
+    }
+
+    .panel button:not(.finish-button):active,
+    .panel a.button:active,
+    .exercise button:not(.exercise-main):not(.set-check):active,
+    .set-row button:not(.set-check):active {
+      background: rgba(23, 24, 25, 0.075);
+    }
+
+    .panel input[type="number"],
+    .panel input[type="text"],
+    .exercise input[type="number"],
+    .exercise input[type="text"],
+    .set-row input[type="number"],
+    .set-row input[type="text"] {
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      border-color: rgba(23, 24, 25, 0.12);
     }
 
     .app-shell.motion-settled .panel,
@@ -535,12 +633,12 @@
       padding: 9px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(23, 24, 25, 0.03);
     }
 
     .phase-group.active {
       border-color: rgba(47, 199, 121, 0.34);
-      background: rgba(47, 199, 121, 0.06);
+      background: rgba(47, 199, 121, 0.1);
     }
 
     .phase-group-head {
@@ -552,6 +650,14 @@
       color: var(--muted);
       font-size: 12px;
       font-weight: 800;
+    }
+
+    .phase-group-head strong,
+    .phase-group-head span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .phase-group-head span {
@@ -581,14 +687,15 @@
     }
 
     .week-card .label {
-      display: block;
+      display: -webkit-box;
       margin-top: 7px;
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.18;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .tiny-bar {
@@ -596,7 +703,7 @@
       margin-top: 8px;
       overflow: hidden;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(23, 24, 25, 0.08);
     }
 
     .tiny-bar span {
@@ -639,6 +746,11 @@
     }
 
     .workout-head {
+      --text: var(--ink);
+      --muted: var(--ink-muted);
+      --dim: var(--ink-dim);
+      --line: var(--card-line);
+      --surface: var(--ivory);
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
@@ -647,9 +759,11 @@
       border: 1px solid color-mix(in srgb, var(--accent), transparent 68%);
       border-radius: var(--radius);
       background:
-        linear-gradient(135deg, color-mix(in srgb, var(--accent), transparent 86%), transparent 64%),
-        var(--surface);
-      animation: riseIn 360ms ease both;
+        linear-gradient(135deg, color-mix(in srgb, var(--accent), transparent 84%), transparent 64%),
+        var(--ivory);
+      color: var(--ink);
+      box-shadow: var(--soft-shadow);
+      animation: riseIn 240ms var(--ease-out) both;
     }
 
     .workout-head h2 {
@@ -673,7 +787,7 @@
       padding: 5px 9px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.045);
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
@@ -686,7 +800,7 @@
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: conic-gradient(var(--accent) var(--pct), rgba(255, 255, 255, 0.08) 0);
+      background: conic-gradient(var(--accent) var(--pct), rgba(23, 24, 25, 0.08) 0);
       position: relative;
       color: var(--text);
       font-size: 20px;
@@ -740,35 +854,56 @@
     }
 
     .check-box {
-      width: 24px;
-      aspect-ratio: 1;
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      min-height: 32px;
       display: grid;
       place-items: center;
       border: 1px solid var(--line-strong);
-      border-radius: 6px;
-      background: var(--surface-2);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18)),
+        rgba(23, 24, 25, 0.055);
       color: transparent;
       cursor: pointer;
-      margin-top: 1px;
-      transition: transform 180ms var(--ease-spring), background 180ms ease, border-color 180ms ease;
+      margin-top: 0;
+      padding: 0;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      transition: transform 150ms var(--ease-out), background 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .check-box svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .check-box:active {
+      transform: scale(0.94);
     }
 
     .check-box.done {
       border-color: var(--green);
-      background: var(--green);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0)),
+        var(--green);
       color: #07140d;
-      animation: checkPop 360ms var(--ease-spring);
+      box-shadow: 0 8px 18px rgba(47, 199, 121, 0.2);
+      animation: checkPop 260ms var(--ease-spring);
     }
 
     .exercise {
       overflow: hidden;
       background: var(--surface);
-      animation: riseIn 340ms ease both;
-      transition: border-color 180ms ease, background 180ms ease, transform 180ms var(--ease-spring);
+      animation: riseIn 220ms var(--ease-out) both;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms var(--ease-out), box-shadow 180ms ease;
     }
 
-    .exercise:hover {
-      transform: translateY(-1px);
+    @media (hover: hover) and (pointer: fine) {
+      .exercise:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 36px rgba(11, 12, 14, 0.14);
+      }
     }
 
     .exercise-main {
@@ -786,7 +921,7 @@
     }
 
     .exercise.done .exercise-main {
-      background: rgba(47, 199, 121, 0.07);
+      background: rgba(47, 199, 121, 0.08);
     }
 
     .muscle-dot {
@@ -860,7 +995,7 @@
       padding: 10px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.035);
     }
 
     .metric small {
@@ -887,7 +1022,7 @@
       padding: 11px 12px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.035);
     }
 
     .cue-list div {
@@ -912,7 +1047,19 @@
       gap: 8px;
       align-items: center;
       padding: 8px;
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(23, 24, 25, 0.025);
+    }
+
+    .set-row label {
+      min-width: 0;
+    }
+
+    .set-row label > .subtle {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .set-row.done {
@@ -938,6 +1085,7 @@
       grid-template-columns: 34px minmax(38px, 1fr) 34px;
       gap: 5px;
       align-items: center;
+      min-width: 0;
     }
 
     .weight-control {
@@ -945,6 +1093,7 @@
       grid-template-columns: 44px minmax(54px, 1fr) 44px;
       gap: 5px;
       align-items: center;
+      min-width: 0;
     }
 
     .rep-control button,
@@ -986,6 +1135,12 @@
       line-height: 1.35;
     }
 
+    .set-rpe-title strong,
+    .set-rpe-title span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     .exercise.shake {
       animation: shakeCard 280ms ease both;
     }
@@ -994,7 +1149,7 @@
       background: var(--green);
       color: #07140d;
       border-color: var(--green);
-      animation: checkPop 360ms var(--ease-spring);
+      animation: checkPop 260ms var(--ease-spring);
     }
 
     .detail-actions {
@@ -1030,7 +1185,7 @@
       min-height: 58px;
       padding: 10px;
       text-align: left;
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.04);
     }
 
     .alt-button strong {
@@ -1102,10 +1257,12 @@
     }
 
     .compact-actions button {
+      min-width: 0;
       min-height: 36px;
       padding: 7px 10px;
       font-size: 13px;
       font-weight: 760;
+      overflow-wrap: anywhere;
     }
 
     .stat-grid {
@@ -1119,7 +1276,7 @@
       padding: 11px 9px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.035);
     }
 
     .stat-tile strong {
@@ -1149,7 +1306,7 @@
       height: 34px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: rgba(50, 182, 216, 0.09);
+      background: rgba(50, 182, 216, 0.12);
       position: relative;
       overflow: hidden;
     }
@@ -1194,7 +1351,7 @@
       color: #07140d;
       border-color: var(--green);
       background: var(--green);
-      animation: checkPop 480ms var(--ease-spring);
+      animation: checkPop 300ms var(--ease-spring);
     }
 
     .history-list {
@@ -1208,7 +1365,7 @@
       gap: 10px;
       align-items: center;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(23, 24, 25, 0.03);
     }
 
     .history-row strong {
@@ -1303,12 +1460,19 @@
       color: var(--text);
       box-shadow: var(--shadow);
       z-index: 20;
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 190ms var(--ease-out), transform 190ms var(--ease-out), visibility 0s linear 190ms;
     }
 
     .toast.show {
-      display: block;
-      animation: toastIn 280ms ease both;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+      transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s;
     }
 
     .progress-hero {
@@ -1320,9 +1484,9 @@
       border: 1px solid rgba(255, 209, 102, 0.34);
       border-radius: var(--radius);
       background:
-        radial-gradient(circle at top right, rgba(255, 209, 102, 0.17), transparent 38%),
-        linear-gradient(135deg, rgba(47, 199, 121, 0.12), transparent 48%),
-        var(--surface);
+        linear-gradient(135deg, rgba(255, 209, 102, 0.18), transparent 52%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent),
+        #111318;
       box-shadow: var(--shadow);
       overflow: hidden;
       position: relative;
@@ -1335,8 +1499,11 @@
       place-items: center;
       border-radius: 24px;
       border: 1px solid rgba(255, 209, 102, 0.28);
-      background: rgba(255, 209, 102, 0.1);
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.9), transparent 18%),
+        linear-gradient(145deg, #fff0a8, #f3a928 46%, #b96515);
       color: var(--gold);
+      box-shadow: inset -8px -10px 18px rgba(83, 43, 0, 0.18), 0 18px 38px rgba(243, 169, 40, 0.2);
       animation: flamePulse 1800ms ease-in-out infinite;
     }
 
@@ -1379,30 +1546,41 @@
       padding: 11px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.03);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 42%),
+        rgba(23, 24, 25, 0.03);
       opacity: 0.48;
-      transition: transform 180ms var(--ease-spring), opacity 180ms ease, border-color 180ms ease;
+      transition: transform 180ms var(--ease-out), opacity 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
 
     .reward-card.unlocked {
       opacity: 1;
       border-color: rgba(255, 209, 102, 0.38);
-      background: rgba(255, 209, 102, 0.08);
+      background:
+        linear-gradient(145deg, rgba(255, 209, 102, 0.24), transparent 55%),
+        var(--ivory-2);
+      box-shadow: 0 18px 36px rgba(96, 70, 10, 0.12);
     }
 
-    .reward-card:hover {
-      transform: translateY(-2px);
+    @media (hover: hover) and (pointer: fine) {
+      .reward-card:hover {
+        transform: translateY(-2px);
+      }
     }
 
     .reward-card .badge-icon {
-      width: 38px;
+      width: 44px;
       aspect-ratio: 1;
       display: grid;
       place-items: center;
-      border-radius: 10px;
-      background: var(--surface-2);
-      color: var(--gold);
+      border-radius: 13px;
+      background:
+        radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.95), transparent 19%),
+        linear-gradient(145deg, #fff2b6, #f3a928 48%, #8c5a12);
+      color: #3f2808;
       margin-bottom: 9px;
+      box-shadow: inset -7px -8px 14px rgba(70, 35, 0, 0.2), 0 10px 18px rgba(126, 83, 12, 0.18);
+      font-size: 22px;
     }
 
     .reward-card strong {
@@ -1442,7 +1620,7 @@
       display: grid;
       place-items: center;
       border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(23, 24, 25, 0.025);
       color: var(--muted);
       position: relative;
       overflow: hidden;
@@ -1476,7 +1654,7 @@
     }
 
     .calendar-day.rest {
-      background: rgba(255, 255, 255, 0.018);
+      background: rgba(23, 24, 25, 0.018);
     }
 
     .calendar-day.freeze {
@@ -1486,17 +1664,24 @@
     }
 
     .calendar-day.today {
-      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 0 0 2px rgba(23, 24, 25, 0.14);
     }
 
     .calendar-day button {
       position: absolute;
       inset: auto 4px 4px 4px;
+      display: grid;
+      place-items: center;
       min-height: 20px;
       padding: 0;
       font-size: 10px;
       font-weight: 800;
       background: rgba(50, 182, 216, 0.12);
+    }
+
+    .calendar-day button svg {
+      width: 13px;
+      height: 13px;
     }
 
     .calendar-legend,
@@ -1514,11 +1699,13 @@
     .calendar-detail strong {
       display: inline-flex;
       align-items: center;
+      max-width: 100%;
       min-height: 28px;
       padding: 5px 8px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.035);
+      overflow-wrap: anywhere;
     }
 
     .rpe-grid {
@@ -1533,6 +1720,7 @@
       font-size: 12px;
       font-weight: 800;
       color: var(--muted);
+      overflow-wrap: anywhere;
     }
 
     .rpe-button.active {
@@ -1545,7 +1733,7 @@
       padding: 11px;
       border: 1px solid rgba(47, 199, 121, 0.26);
       border-radius: var(--radius);
-      background: rgba(47, 199, 121, 0.08);
+      background: rgba(47, 199, 121, 0.1);
       color: var(--muted);
       font-size: 13px;
       line-height: 1.45;
@@ -1583,6 +1771,7 @@
       width: 100%;
       max-width: 140px;
       height: auto;
+      filter: drop-shadow(0 12px 22px rgba(17, 18, 19, 0.08));
     }
 
     .body-svg [data-action="body-muscle"] {
@@ -1611,7 +1800,9 @@
       border-radius: 999px;
       font-size: 12px;
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(23, 24, 25, 0.035);
+      max-width: 100%;
+      overflow-wrap: anywhere;
     }
 
     .legend-dot {
@@ -1644,7 +1835,44 @@
       overflow: visible;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(23, 24, 25, 0.025);
+    }
+
+    .volume-chart {
+      width: 100%;
+      min-height: 154px;
+      overflow: visible;
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(138, 114, 232, 0.08), transparent),
+        rgba(23, 24, 25, 0.02);
+    }
+
+    .volume-chart text {
+      fill: var(--ink-muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .volume-chart .grid {
+      stroke: rgba(23, 24, 25, 0.08);
+      stroke-width: 1;
+    }
+
+    .volume-chart .volume-bar {
+      fill: var(--violet);
+      rx: 5;
+      filter: drop-shadow(0 8px 12px rgba(138, 114, 232, 0.2));
+    }
+
+    .volume-chart .volume-line {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .body-log-list {
@@ -1659,7 +1887,7 @@
       padding: 12px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(23, 24, 25, 0.035);
     }
 
     .ring-card strong {
@@ -1679,7 +1907,7 @@
       padding: 11px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(23, 24, 25, 0.035);
     }
 
     .record-card strong,
@@ -1718,8 +1946,8 @@
       border-radius: 22px;
       border: 1px solid rgba(255, 255, 255, 0.14);
       background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03)),
-        #151820;
+        linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
+        #101217;
       box-shadow: var(--shadow);
     }
 
@@ -1754,7 +1982,7 @@
     }
 
     @keyframes appEnter {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -1774,8 +2002,8 @@
     }
 
     @keyframes checkPop {
-      0% { transform: scale(0.88); }
-      55% { transform: scale(1.12); }
+      0% { transform: scale(0.94); }
+      55% { transform: scale(1.06); }
       100% { transform: scale(1); }
     }
 
@@ -1827,6 +2055,13 @@
         animation-duration: 1ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .streak-flame,
+      .yoga-icon,
+      .confetti-piece {
+        animation: none !important;
       }
     }
 
@@ -1843,11 +2078,13 @@
       align-items: center;
       padding: 10px;
       border: 1px solid rgba(50, 182, 216, 0.4);
-      border-radius: var(--radius);
-      background: rgba(17, 20, 25, 0.96);
+      border-radius: 18px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+        rgba(12, 14, 18, 0.96);
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
-      transition: opacity 180ms ease, transform 220ms var(--ease-spring), border-color 180ms ease;
+      transition: opacity 180ms ease, transform 220ms var(--ease-out), border-color 180ms ease;
     }
 
     .pull-indicator {
@@ -1880,7 +2117,7 @@
     .mini-timer.is-hidden {
       opacity: 0;
       pointer-events: none;
-      transform: translateX(-50%) translateY(16px);
+      transform: translateX(-50%) translateY(14px) scale(0.98);
     }
 
     .mini-timer strong {
@@ -1956,10 +2193,12 @@
         gap: 4px;
         margin: 0;
         padding: 6px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(17, 20, 25, 0.96);
-        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 18px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025)),
+          rgba(10, 12, 16, 0.94);
+        backdrop-filter: blur(16px);
         box-shadow: var(--shadow);
       }
 
@@ -1969,6 +2208,18 @@
         gap: 3px;
         padding: 6px 2px 8px;
         font-size: 9px;
+        border-radius: 13px;
+      }
+
+      .nav-tabs button.active {
+        color: #07140d;
+        border-color: rgba(47, 199, 121, 0.62);
+        background: var(--green);
+        box-shadow: 0 10px 22px rgba(47, 199, 121, 0.22);
+      }
+
+      .nav-tabs button.active::after {
+        display: none;
       }
 
       .nav-tabs button span:not(.icon) {
@@ -2075,6 +2326,10 @@
 
       .body-weight-input,
       .recovery-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .today-command-grid {
         grid-template-columns: 1fr;
       }
 
@@ -3671,6 +3926,28 @@
       return result;
     }
 
+    function volumeTrend(daysCount = 7) {
+      const days = Array.from({ length: daysCount }, (_, idx) => {
+        const date = addDays(new Date(), idx - daysCount + 1);
+        return { key: dateKey(date), label: date.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", ""), volume: 0, sets: 0 };
+      });
+      const byKey = Object.fromEntries(days.map(day => [day.key, day]));
+      allSetEntries().forEach(entry => {
+        const log = state.logs[entry.setKey];
+        if (!log || !log.done || !log.doneAt) return;
+        const key = String(log.doneAt).slice(0, 10);
+        if (!byKey[key]) return;
+        const weight = numberValue(log.weight) || 0;
+        const reps = numberValue(log.reps) || 0;
+        byKey[key].volume += weight * reps;
+        byKey[key].sets += 1;
+      });
+      const totalVolume = Math.round(days.reduce((sum, day) => sum + day.volume, 0));
+      const totalSets = days.reduce((sum, day) => sum + day.sets, 0);
+      const best = [...days].sort((a, b) => b.volume - a.volume)[0] || days[0];
+      return { days, totalVolume, totalSets, best };
+    }
+
     function progressionSuggestion(weekIdx, dayIdx, exIdx) {
       const base = prescribedExercise(weekIdx, dayIdx, exIdx);
       const store = getExerciseStore(base.planId);
@@ -4065,7 +4342,7 @@
       setTimeout(checkSmartReminders, 450);
       if (!ui.hasMounted) {
         ui.hasMounted = true;
-        setTimeout(() => app.classList.add("motion-settled"), 460);
+        setTimeout(() => app.classList.add("motion-settled"), 260);
       }
     }
 
@@ -4189,20 +4466,27 @@
       const home = currentHomeWorkout();
       const homeStats = homeProgress(home);
       const yogaState = yogaDayState(yoga);
+      const recovery = recoveryScore();
+      const workoutPct = plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0;
       return `
         <div class="layout">
           <section class="stack">
             <div class="workout-head today-hero" style="--accent:${plan.type === "gym" ? currentWeek().days[gymDayIdx].color : plan.type === "home" ? "var(--cyan)" : "var(--green)"}; --pct:${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%">
               <div>
                 <p class="eyebrow">${escapeHtml(new Date().toLocaleDateString("ru-RU", { day: "2-digit", month: "long" }))}</p>
-                <h2>${escapeHtml(plan.label)} по плану</h2>
+                <h2>Центр тренировки</h2>
                 <div class="workout-meta">
+                  <span class="pill">${icon("activity")}Готовность ${recovery.value}%</span>
                   <span class="pill">${icon("stretch")}Йога каждое утро</span>
                   <span class="pill">${plan.type === "gym" ? `${gymProgress.doneSets}/${gymProgress.totalSets} подходов` : plan.type === "home" ? `${homeStats.done}/${homeStats.total} кругов/упр.` : "мягкое восстановление"}</span>
-                  <span class="pill">RPE цель 6-7</span>
+                </div>
+                <div class="today-command-grid">
+                  <div class="today-command-chip"><strong>${escapeHtml(plan.label)}</strong><span>сегодня по плану</span></div>
+                  <div class="today-command-chip"><strong>${workoutPct}%</strong><span>готово сейчас</span></div>
+                  <div class="today-command-chip"><strong>${escapeHtml(nextWorkoutLabel())}</strong><span>следующая</span></div>
                 </div>
               </div>
-              <div class="progress-ring" style="--accent:var(--green); --pct:${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%"><span>${plan.type === "gym" ? gymProgress.pct : plan.type === "home" ? homeStats.pct : yogaState.done ? 100 : 0}%</span></div>
+              <div class="progress-ring" style="--accent:var(--green); --pct:${workoutPct}%"><span>${workoutPct}%</span></div>
             </div>
             ${renderRecoveryBar()}
 
@@ -4896,6 +5180,7 @@
         <div class="layout">
           <section class="stack">
             ${renderProgressHero(progress)}
+            ${renderVolumeTrendPanel()}
             ${renderBodyMapPanel()}
             ${renderBodyWeightPanel()}
             ${renderWeeklyRingsPanel(progress.activity)}
@@ -4929,6 +5214,58 @@
           </div>
           <div class="streak-flame">${ICONS.flame}</div>
         </section>
+      `;
+    }
+
+    function renderVolumeTrendPanel() {
+      const trend = volumeTrend(7);
+      return `
+        <section class="panel">
+          <div class="section-title">
+            <h2>${icon("chart")}Объем нагрузки</h2>
+            <small>последние 7 дней</small>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-tile"><strong>${trend.totalVolume}</strong><span>кг объема</span></div>
+            <div class="stat-tile"><strong>${trend.totalSets}</strong><span>подходов</span></div>
+            <div class="stat-tile"><strong>${trend.best ? Math.round(trend.best.volume) : 0}</strong><span>лучший день</span></div>
+          </div>
+          ${renderVolumeChart(trend.days)}
+        </section>
+      `;
+    }
+
+    function renderVolumeChart(days) {
+      const W = 320;
+      const H = 150;
+      const padX = 22;
+      const padY = 20;
+      const max = Math.max(1, ...days.map(day => day.volume));
+      const barW = 18;
+      const gap = (W - padX * 2 - days.length * barW) / Math.max(1, days.length - 1);
+      const points = days.map((day, idx) => {
+        const x = padX + idx * (barW + gap) + barW / 2;
+        const y = H - padY - (day.volume / max) * (H - padY * 2);
+        return `${Math.round(x)},${Math.round(y)}`;
+      });
+      return `
+        <svg class="volume-chart" viewBox="0 0 ${W} ${H}" aria-label="График объема нагрузки за 7 дней">
+          ${[0, 1, 2].map(idx => {
+            const y = padY + idx * ((H - padY * 2) / 2);
+            return `<line class="grid" x1="${padX}" y1="${y}" x2="${W - padX}" y2="${y}"/>`;
+          }).join("")}
+          ${days.map((day, idx) => {
+            const x = padX + idx * (barW + gap);
+            const h = Math.max(5, (day.volume / max) * (H - padY * 2));
+            const y = H - padY - h;
+            return `<rect class="volume-bar" x="${Math.round(x)}" y="${Math.round(y)}" width="${barW}" height="${Math.round(h)}"></rect>`;
+          }).join("")}
+          <polyline class="volume-line" points="${points.join(" ")}"></polyline>
+          ${days.map((day, idx) => {
+            const x = padX + idx * (barW + gap) + barW / 2;
+            return `<text x="${Math.round(x)}" y="${H - 5}" text-anchor="middle">${escapeHtml(day.label)}</text>`;
+          }).join("")}
+        </svg>
       `;
     }
 
@@ -5119,7 +5456,7 @@
               <div class="calendar-day ${day.status} ${day.isToday ? "today" : ""}" title="${day.key}" data-action="calendar-day" data-date="${day.key}">
                 <span style="${day.inMonth ? "" : "opacity:.25"}">${day.date.getDate()}</span>
                 <em>${calendarDayIcon(day.key)}</em>
-                ${day.status === "missed" && freezes < 2 ? `<button type="button" data-action="freeze-day" data-date="${day.key}">щит</button>` : ""}
+                ${day.status === "missed" && freezes < 2 ? `<button type="button" data-action="freeze-day" data-date="${day.key}" title="Заморозить пропуск" aria-label="Заморозить пропуск">${ICONS.shield}</button>` : ""}
               </div>
             `).join("")}
           </div>
@@ -5610,10 +5947,12 @@
         return;
       }
       if (action === "timer-start") {
+        target.blur?.();
         startTimer(Number(target.dataset.seconds), target.dataset.label || "Отдых");
         return;
       }
       if (action === "timer-toggle") {
+        target.blur?.();
         state.timer.running = !state.timer.running;
         if (state.timer.left <= 0) state.timer.left = state.timer.total || 90;
         saveState();
@@ -5622,6 +5961,7 @@
         return;
       }
       if (action === "timer-add") {
+        target.blur?.();
         const next = Math.max(0, state.timer.left + Number(target.dataset.delta));
         state.timer.left = next;
         state.timer.total = Math.max(state.timer.total, next);
@@ -5630,6 +5970,7 @@
         return;
       }
       if (action === "timer-reset") {
+        target.blur?.();
         state.timer.left = state.timer.total || 90;
         state.timer.running = false;
         saveState();

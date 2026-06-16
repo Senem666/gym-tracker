@@ -1,6 +1,6 @@
-const CACHE = "gym-assistant-pro-v3";
+const CACHE = "gymper-v7";
 const ASSETS = [
-  "gym-assistant-pro.html",
+  "index.html",
   "manifest.webmanifest",
   "gym-icon.svg"
 ];
@@ -28,7 +28,7 @@ self.addEventListener("fetch", event => {
         const copy = response.clone();
         caches.open(CACHE).then(cache => cache.put(event.request, copy));
         return response;
-      }).catch(() => caches.match(event.request).then(cached => cached || caches.match("gym-assistant-pro.html")))
+      }).catch(() => caches.match(event.request).then(cached => cached || caches.match("index.html")))
     );
     return;
   }
@@ -38,7 +38,7 @@ self.addEventListener("fetch", event => {
         const copy = response.clone();
         caches.open(CACHE).then(cache => cache.put(event.request, copy));
         return response;
-      }).catch(() => caches.match("gym-assistant-pro.html"))
+      }).catch(() => caches.match("index.html"))
     )
   );
 });
