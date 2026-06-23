@@ -1,8 +1,12 @@
-const CACHE = "gymper-v7";
+const CACHE = "gymper-v10";
 const ASSETS = [
   "index.html",
   "manifest.webmanifest",
-  "gym-icon.svg"
+  "gym-icon.svg",
+  "app_icon_strength_crest_180.png",
+  "app_icon_strength_crest_192.png",
+  "app_icon_strength_crest_512.png",
+  "gymper-body-map.png"
 ];
 
 self.addEventListener("install", event => {
